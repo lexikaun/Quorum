@@ -2,9 +2,10 @@
 import json
 import os
 import re
-import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -16,9 +17,10 @@ NODE = r"node(?:\.js|js)?(?:\s+version)?\s+v?"
 VERSION = r"(?P<version>\d{1,3}(?:\.\d{1,5}){0,2})"
 RUNTIME_CLAIMS = (
     rf"(?:{VITE}\s+)?(?P<neg>does not |doesn't )?(?:supports?|runs? on|works? (?:with|on)|is compatible with)\s+{NODE}{VERSION}",
-    rf"{NODE}{VERSION}\s+(?:is\s+)?(?P<neg>not )?(?:supported|compatible|works?|runs?|sufficient|enough)(?:\s+(?:with|by|for|on)\s+{VITE})?",
+    rf"{NODE}{VERSION}\s+(?:is\s+)?(?:still )?(?P<neg>not )?(?:supported|compatible|works?|runs?|sufficient|enough)(?:\s+(?:with|by|for|on)\s+{VITE})?",
     rf"{NODE}{VERSION}\s+is\s+(?P<neg>unsupported|incompatible)(?:\s+(?:with|by|for|on)\s+{VITE})?",
-    rf"(?:use|install) {NODE}{VERSION}(?:\s+(?:with|for)\s+{VITE})?",
+    rf"(?:you can )?(?:use|install) {NODE}{VERSION}(?:\s+(?:with|for)\s+{VITE})?",
+    rf"(?:you can )?(?:run|use) {VITE} (?:on|with) {NODE}{VERSION}",
 )
 DEFAULT_CLAIM = (
     rf"(?:(?:in\s+)?{VITE}[,']*s?\s+)?(?:the\s+)?default (?:build\.target|(?:browser |build )target)"
@@ -37,7 +39,8 @@ def _parse(statement, target):
     versions = re.findall(r"\bvite\s+v?(\d+)\b", clean)
     if any(v != target[-1] for v in versions):
         return None, "The claim names a different Vite release. Select that release to check it."
-    floor = re.fullmatch(rf"(?:{VITE}\s+)?(?:requires?|needs?) (?:at least )?{NODE}{VERSION}", clean)
+    floor = (re.fullmatch(rf"(?:{VITE}\s+)?(?:requires?|needs?) (?:at least )?{NODE}{VERSION}", clean)
+             or re.fullmatch(rf"(?:the )?minimum node(?:\.js)? version(?: for {VITE})? is {VERSION}", clean))
     if floor:
         return ("node", "minimum", floor["version"], False), ""
     dropped = re.fullmatch(rf"(?:{VITE}\s+)?(?:dropped support for|no longer supports) {NODE}{VERSION}", clean)
@@ -71,7 +74,6 @@ def _split_claims(statement, target):
     runtime_prefix = re.fullmatch(rf"(.*?){NODE}{VERSION}[.!]?", parts[0], re.I)
     for original in parts[1:]:
         expanded = original
-        candidate_target = target
         if not re.search(r"\bvite\b", original, re.I):
             if runtime_prefix and first[1] == "runtime" and re.fullmatch(rf"{NODE}{VERSION}[.!]?", original, re.I):
                 expanded = runtime_prefix[1] + original
@@ -80,7 +82,7 @@ def _split_claims(statement, target):
             if scoped_target != target:
                 claims.append((original, None, "This clause refers to a different Vite release."))
                 continue
-        claims.append((original, *_parse(expanded, candidate_target)))
+        claims.append((original, *_parse(expanded, target)))
     return claims
 
 
@@ -135,12 +137,65 @@ def _normalized(text):
     return " ".join(text.replace(chr(96), "").replace("’", "'").split()).casefold()
 
 
-def _sources(topics, target, mode, timestamp, trace, as_of):
-    candidates = [s for s in SNAPSHOT["sources"] if s["topic"] in topics and s["target"] <= target
-                  and (as_of is None or (s["published_at"] or SNAPSHOT["retrieved_at"][:10]) <= as_of)]
-    if mode == "replay":
-        trace.append({"operation": "read_snapshot", "status": "ok", "sources": len(candidates)})
-        return {(s["target"], s["topic"]): dict(s, retrieved_at=SNAPSHOT["retrieved_at"]) for s in candidates}
+def _manifest_matches(raw, source):
+    # Extract may surround the JSON with a Markdown code block.
+    start = raw.find("{")
+    if start < 0:
+        return False
+    try:
+        manifest, _ = json.JSONDecoder().raw_decode(raw[start:])
+    except ValueError:
+        return False
+    return (isinstance(manifest, dict) and manifest.get("name") == "vite"
+            and manifest.get("version") == source["target"][-1] + ".0.0"
+            and isinstance(manifest.get("engines"), dict)
+            and manifest["engines"].get("node") == source["engine"])
+
+
+class _VisibleText(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.parts = []
+        self.hidden = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style"):
+            self.hidden = True
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style"):
+            self.hidden = False
+
+    def handle_data(self, data):
+        if not self.hidden:
+            self.parts.append(data)
+
+
+def _read_upstream(url):
+    request = urllib.request.Request(url, headers={"User-Agent": "QuorumEvidenceLab/1.0"})
+    try:
+        with urllib.request.urlopen(request, timeout=8) as response:
+            if _page(response.geturl()) != url:
+                return None
+            body = response.read(1_000_001)
+            if len(body) > 1_000_000:
+                return None
+            content = body.decode("utf-8")
+            if response.headers.get_content_type() == "text/html":
+                parser = _VisibleText()
+                parser.feed(content)
+                parser.close()
+                return " ".join(parser.parts)
+            return content
+    except (OSError, ValueError):
+        return None
+
+
+def _source_urls(sources):
+    return list(sources) + [s["engine_manifest"] for s in sources.values() if "engine_manifest" in s]
+
+
+def _tavily_extracts(candidates, trace):
     key = os.environ.get("TAVILY_API_KEY", "").strip()
     if not key:
         raise ValueError("Live evidence requires TAVILY_API_KEY on the server.")
@@ -155,26 +210,46 @@ def _sources(topics, target, mode, timestamp, trace, as_of):
         trace.append({"operation": "tavily.search", "status": "matched" if matched else "no_match", "query": query})
         if matched:
             found[url] = s
-    verified = {}
+    extracts = {}
     if found:
-        urls = list(found) + [s["engine_manifest"] for s in found.values() if "engine_manifest" in s]
+        urls = _source_urls(found)
         rows = _tavily("extract", {"urls": urls, "extract_depth": "basic", "format": "markdown"}, key)
-        extracts = {}
         for row in rows:
             if isinstance(row.get("url"), str) and isinstance(row.get("raw_content"), str):
                 extracts[_page(row["url"])] = row["raw_content"]
-        for url, s in found.items():
-            if _normalized(s["excerpt"]) not in _normalized(extracts.get(url, "")):
-                continue
-            if "engine" in s:
-                # Search snippets and prose like "20.19+" cannot resolve the 21.x gap.
-                # Validate the engine field on the same release's immutable manifest.
-                manifest = extracts.get(s["engine_manifest"], "")
-                engine_pattern = r'"engines"\s*:\s*\{\s*"node"\s*:\s*"' + re.escape(s["engine"]) + r'"'
-                if not re.search(engine_pattern, manifest):
-                    continue
-            verified[s["target"], s["topic"]] = dict(s, retrieved_at=timestamp)
-        trace.append({"operation": "tavily.extract", "status": "ok", "pages": len(urls), "matched": len(verified)})
+        trace.append({"operation": "tavily.extract", "status": "ok", "requested": len(urls), "returned": len(extracts)})
+    return found, extracts
+
+
+def _sources(topics, target, mode, timestamp, trace, as_of, replay_sources):
+    candidates = [s for s in SNAPSHOT["sources"] if s["topic"] in topics and s["target"] <= target
+                  and (as_of is None or (s["published_at"] or SNAPSHOT["retrieved_at"][:10]) <= as_of)]
+    if mode == "replay":
+        if replay_sources is not None:
+            allowed = set(replay_sources)
+            candidates = [s for s in candidates if s["url"] in allowed]
+        trace.append({"operation": "read_snapshot", "status": "ok", "sources": len(candidates)})
+        return {(s["target"], s["topic"]): dict(s, retrieved_at=SNAPSHOT["retrieved_at"]) for s in candidates}
+    if mode == "public":
+        found = {_page(s["url"]): s for s in candidates}
+        urls = _source_urls(found)
+        extracts = {}
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            for url, content in zip(urls, pool.map(_read_upstream, urls)):
+                trace.append({"operation": "upstream.get", "url": url, "status": "ok" if content else "unavailable"})
+                if content:
+                    extracts[url] = content
+    else:
+        found, extracts = _tavily_extracts(candidates, trace)
+    verified = {}
+    for url, s in found.items():
+        if _normalized(s["excerpt"]) not in _normalized(extracts.get(url, "")):
+            continue
+        # Prose such as "20.19+" cannot resolve the 21.x gap. Check the tagged manifest too.
+        if "engine" in s and not _manifest_matches(extracts.get(s["engine_manifest"], ""), s):
+            continue
+        verified[s["target"], s["topic"]] = dict(s, retrieved_at=timestamp)
+    trace.append({"operation": "check_excerpts", "status": "ok", "matched": len(verified)})
     return verified
 
 
@@ -222,10 +297,12 @@ def _receipt(statement, parsed, reason, target, sources, as_of):
     return receipt
 
 
-def verify(text, target="Vite 7", mode="replay", as_of=None):
+def verify(text, target="Vite 7", mode="replay", as_of=None, *, replay_sources=None):
     """Return evidence receipts. Score measures target support, and unknown has no score."""
-    if target not in TARGETS or mode not in ("replay", "live"):
-        raise ValueError("Select Vite 6 or Vite 7 and replay or live mode.")
+    if target not in TARGETS or mode not in ("replay", "public", "live"):
+        raise ValueError("Select Vite 6 or Vite 7 and replay, public or live mode.")
+    if replay_sources is not None and mode != "replay":
+        raise ValueError("The replay source filter applies only to replay mode.")
     if not isinstance(text, str) or not text.strip() or len(text) > 32_000:
         raise ValueError("Paste between 1 and 32,000 characters of documentation.")
     if as_of is not None:
@@ -237,9 +314,13 @@ def verify(text, target="Vite 7", mode="replay", as_of=None):
     if not statements:
         raise ValueError("Paste at least one statement to verify.")
     trace = []
-    sources = _sources({parsed[0] for _, parsed, _ in statements if parsed}, target, mode, timestamp, trace, as_of)
+    topics = {parsed[0] for _, parsed, _ in statements if parsed}
+    sources = _sources(topics, target, mode, timestamp, trace, as_of, replay_sources)
     claims = [_receipt(s, parsed, reason, target, sources, as_of) for s, parsed, reason in statements]
-    privacy = ("Replay reads bundled public excerpts locally. No external requests."
-               if mode == "replay" else "Only public Vite release and topic queries go to Tavily. Pasted text stays local.")
+    privacy = {
+        "replay": "Replay reads bundled public excerpts locally. No external requests.",
+        "public": "The server fetches fixed official Vite pages and manifests. Pasted text stays local.",
+        "live": "Only public Vite release and topic queries go to Tavily. Pasted text stays local.",
+    }[mode]
     return {"target": target, "mode": mode, "as_of": as_of, "timestamp": timestamp, "privacy": privacy,
             "trace": trace, "claims": claims}

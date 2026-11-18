@@ -162,6 +162,30 @@ class VerificationTests(unittest.TestCase):
                 with self.subTest(target=target, mode=mode), self.assertRaises(ValueError):
                     verify("Node 18 works.", target, mode)
 
+    def test_public_mode_reports_source_outage_without_using_replay_or_tavily(self):
+        seen = []
+
+        def offline(req, timeout):
+            seen.append(req.full_url)
+            raise OSError("upstream offline")
+
+        with patch.dict(os.environ, TAVILY_API_KEY=""), patch("urllib.request.urlopen", offline):
+            result = verify("Node 18 works. Node 22.12 works.", "Vite 7", "public")
+        self.assertEqual([c["verdict"] for c in result["claims"]], ["unknown", "unknown"])
+        self.assertTrue(seen)
+        self.assertTrue(all("tavily" not in url for url in seen))
+        self.assertTrue(any(e["status"] == "unavailable" for e in result["trace"]))
+
+    def test_replay_cannot_consult_withheld_sources(self):
+        task = "Vite 7 supports Node 18."
+        old_url = "https://vite.dev/blog/announcing-vite6#node-js-support"
+        new_url = "https://vite.dev/blog/announcing-vite7#node-js-support"
+        for allowed, expected in [([], "unknown"), ([old_url], "unknown"),
+                                  ([new_url], "contradicted"), ([old_url, new_url], "superseded")]:
+            with self.subTest(allowed=allowed):
+                result = verify(task, "Vite 7", replay_sources=set(allowed))
+                self.assertEqual(result["claims"][0]["verdict"], expected)
+
 
 if __name__ == "__main__":
     unittest.main()

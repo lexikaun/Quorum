@@ -1,0 +1,3945 @@
+{
+  "repeats": 2,
+  "caseCount": 12,
+  "runs": [
+    {
+      "id": "v6-node18-1-0",
+      "caseId": "v6-node18",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 6 supports Node.js 18.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.6542,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node18-1-1",
+      "caseId": "v6-node18",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 6 supports Node.js 18.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 86.2769,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node18-1-2",
+      "caseId": "v6-node18",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 6 supports Node.js 18.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 17459.1618,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 533,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-Db5ht2XW38oM1czagAAptNifOiJhxFkf"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node18-1-0",
+      "caseId": "v7-node18",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 18.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 0.3631,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node18-1-1",
+      "caseId": "v7-node18",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 18.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.4557,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This guidance matches Vite 6. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "superseded",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "superseded",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node18-1-2",
+      "caseId": "v7-node18",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 18.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 21234.3611,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 533,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-9PGoYKIZJXqR7rlr0fprhQNwTjHrUwIb"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node22-1-0",
+      "caseId": "v7-node22",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.3963,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^20.19.0 || >=22.12.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node22-1-1",
+      "caseId": "v7-node22",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.4479,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node22-1-2",
+      "caseId": "v7-node22",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 15553.5178,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 538,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-MTAlJ4JeaW6nzwbhmfCFlFXcBtah8xtf"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-before-floor-1-0",
+      "caseId": "v7-before-floor",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 20.18.0.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 0.8079,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-before-floor-1-1",
+      "caseId": "v7-before-floor",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 20.18.0.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.8442,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This guidance matches Vite 6. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "superseded",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "superseded",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-before-floor-1-2",
+      "caseId": "v7-before-floor",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 20.18.0.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 19538.2432,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 538,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-Md9a01UkG502WMgemaj4yL77bqnUwzi9"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node16-1-0",
+      "caseId": "v6-node16",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 6 supports Node.js 16.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.5108,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "contradicted",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node16-1-1",
+      "caseId": "v6-node16",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 6 supports Node.js 16.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.5953,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later.",
+          "tool": false,
+          "verdict": "contradicted",
+          "evidence": [
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "contradicted",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node16-1-2",
+      "caseId": "v6-node16",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 6 supports Node.js 16.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 19065.9952,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 533,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-dYeyFLZCUeolz5RfCdYSk5BMZAdeZ7rL"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-outage-1-0",
+      "caseId": "v7-outage",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "source outage",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.0141,
+      "steps": 2,
+      "toolCalls": 1,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "0 snapshots returned",
+          "tool": true,
+          "status": "outage",
+          "sources": []
+        },
+        {
+          "step": 2,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-outage-1-1",
+      "caseId": "v7-outage",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "source outage",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.0077,
+      "steps": 2,
+      "toolCalls": 1,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "0 snapshots returned",
+          "tool": true,
+          "status": "outage",
+          "sources": []
+        },
+        {
+          "step": 2,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-outage-1-2",
+      "caseId": "v7-outage",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "source outage",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 3532.464,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 160,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "0 snapshots returned",
+          "tool": true,
+          "status": "outage",
+          "sources": []
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-cekawe18QfrVqrzT7zl2fp6R2f5JOtNN"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-default-1-0",
+      "caseId": "v6-default",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.5841,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'modules'",
+          "tool": true,
+          "url": "https://v6.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-default-1-1",
+      "caseId": "v6-default",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 5.0508,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "The default build.target in Vite 6 is 'modules'.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 6",
+              "title": "Vite 6 build options · build.target",
+              "url": "https://v6.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'modules'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-default-1-2",
+      "caseId": "v6-default",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 10992.0802,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 364,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-92bx4CdyTpG2C2tdfGqk3Ecsla6oU1f6"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-old-default-1-0",
+      "caseId": "v7-old-default",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 0.4007,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'modules'",
+          "tool": true,
+          "url": "https://v6.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-old-default-1-1",
+      "caseId": "v7-old-default",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.5651,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This guidance matches Vite 6. The default build.target in Vite 7 is 'baseline-widely-available'.",
+          "tool": false,
+          "verdict": "superseded",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7 build options · build.target",
+              "url": "https://v7.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'baseline-widely-available'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6 build options · build.target",
+              "url": "https://v6.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'modules'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "superseded",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-old-default-1-2",
+      "caseId": "v7-old-default",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 10270.0318,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 364,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-T7n5drQDRHiEjSnl4slD6ilvzBW1NBwd"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-default-1-0",
+      "caseId": "v7-default",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "The default build.target is 'baseline-widely-available'.",
+      "target": "Vite 7",
+      "condition": "older source timeout",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.4987,
+      "steps": 4,
+      "toolCalls": 3,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Read older source",
+          "detail": "Injected timeout for the Vite 6 snapshot",
+          "tool": true,
+          "status": "timeout"
+        },
+        {
+          "step": 2,
+          "action": "Search release index",
+          "detail": "1 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'baseline-widely-available'",
+          "tool": true,
+          "url": "https://v7.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-default-1-1",
+      "caseId": "v7-default",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "The default build.target is 'baseline-widely-available'.",
+      "target": "Vite 7",
+      "condition": "older source timeout",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.655,
+      "steps": 5,
+      "toolCalls": 3,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Read older source",
+          "detail": "Injected timeout for the Vite 6 snapshot",
+          "tool": true,
+          "status": "timeout"
+        },
+        {
+          "step": 2,
+          "action": "Search release index",
+          "detail": "1 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 4,
+          "action": "Inspect cited evidence",
+          "detail": "The default build.target in Vite 7 is 'baseline-widely-available'.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7 build options · build.target",
+              "url": "https://v7.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'baseline-widely-available'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 5,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-default-1-2",
+      "caseId": "v7-default",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "The default build.target is 'baseline-widely-available'.",
+      "target": "Vite 7",
+      "condition": "older source timeout",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 10107.4131,
+      "steps": 5,
+      "toolCalls": 3,
+      "tokens": 268,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Read older source",
+          "detail": "Injected timeout for the Vite 6 snapshot",
+          "tool": true,
+          "status": "timeout"
+        },
+        {
+          "step": 2,
+          "action": "Search release index",
+          "detail": "1 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 4,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-WyY8MT2YAZrjnMoRhiy64wWqHiC5egV7"
+        },
+        {
+          "step": 5,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node20-1-0",
+      "caseId": "v7-node20",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Node.js 20 is supported.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "contradicted",
+      "success": false,
+      "latencyMs": 0.6294,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^20.19.0 || >=22.12.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "contradicted",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node20-1-1",
+      "caseId": "v7-node20",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Node.js 20 is supported.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.8466,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "The named major spans both supported and unsupported versions. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "unknown",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node20-1-2",
+      "caseId": "v7-node20",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Node.js 20 is supported.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 23678.8131,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 530,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-gJfuSNQ4fC6bwYFhZcvZkQrJ7z4g5QTh"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-dropped-1-0",
+      "caseId": "v7-dropped",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Vite 7 dropped support for Node.js 18.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 0.4439,
+      "steps": 2,
+      "toolCalls": 1,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-dropped-1-1",
+      "caseId": "v7-dropped",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Vite 7 dropped support for Node.js 18.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.6354,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-dropped-1-2",
+      "caseId": "v7-dropped",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Vite 7 dropped support for Node.js 18.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 18398.5443,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 535,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-p0rFzUHS3a1JbQ7VLyWyoCt28fmG61kr"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-duration-1-0",
+      "caseId": "v6-duration",
+      "agent": "First-result reader",
+      "repeat": 1,
+      "task": "Production builds finish in two seconds.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.4766,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'modules'",
+          "tool": true,
+          "url": "https://v6.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-duration-1-1",
+      "caseId": "v6-duration",
+      "agent": "Version-aware verifier",
+      "repeat": 1,
+      "task": "Production builds finish in two seconds.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 1.4409,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This verifier has no matching check for this statement in its versioned evidence.",
+          "tool": false,
+          "verdict": "unknown",
+          "evidence": [],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 0
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-duration-1-2",
+      "caseId": "v6-duration",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 1,
+      "task": "Production builds finish in two seconds.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 12927.7443,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 362,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-8LmJpT4ayGB4bQcbQu7cI9NfcQHuOWfy"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node18-2-0",
+      "caseId": "v6-node18",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 6 supports Node.js 18.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.5298,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node18-2-1",
+      "caseId": "v6-node18",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 6 supports Node.js 18.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.6387,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node18-2-2",
+      "caseId": "v6-node18",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 6 supports Node.js 18.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 631.7297,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 533,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-FUBTV0HVXKxu4jNYSCSpCbENciADBoRo"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node18-2-0",
+      "caseId": "v7-node18",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 18.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 0.5506,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node18-2-1",
+      "caseId": "v7-node18",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 18.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.6411,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This guidance matches Vite 6. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "superseded",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "superseded",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node18-2-2",
+      "caseId": "v7-node18",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 18.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 700.869,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 533,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-uWsfJJ57zVXVfPOWDztFiH7H68cJ7N3L"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node22-2-0",
+      "caseId": "v7-node22",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.5496,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^20.19.0 || >=22.12.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node22-2-1",
+      "caseId": "v7-node22",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.7449,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node22-2-2",
+      "caseId": "v7-node22",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 931.4309,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 538,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-7cKPtaRg8YHIZdbxB3PJioUlIwluj5Kl"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-before-floor-2-0",
+      "caseId": "v7-before-floor",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 20.18.0.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 0.6319,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-before-floor-2-1",
+      "caseId": "v7-before-floor",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 20.18.0.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.7925,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This guidance matches Vite 6. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "superseded",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "superseded",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-before-floor-2-2",
+      "caseId": "v7-before-floor",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 20.18.0.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 739.2078,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 538,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-ccj7xNHJoCYbnpWcWtKpzka2V3HFoBgP"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node16-2-0",
+      "caseId": "v6-node16",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 6 supports Node.js 16.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.6268,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^18.0.0 || ^20.0.0 || >=22.0.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "contradicted",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node16-2-1",
+      "caseId": "v6-node16",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 6 supports Node.js 16.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.7104,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later.",
+          "tool": false,
+          "verdict": "contradicted",
+          "evidence": [
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "contradicted",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-node16-2-2",
+      "caseId": "v6-node16",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 6 supports Node.js 16.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 1083.9248,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 533,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite6#node-js-support",
+            "https://vite.dev/blog/announcing-vite7#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-rH5TzfxhJF1Jp56EIUtClIU7Wrtiezme"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-outage-2-0",
+      "caseId": "v7-outage",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "source outage",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.0352,
+      "steps": 2,
+      "toolCalls": 1,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "0 snapshots returned",
+          "tool": true,
+          "status": "outage",
+          "sources": []
+        },
+        {
+          "step": 2,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-outage-2-1",
+      "caseId": "v7-outage",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "source outage",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.0177,
+      "steps": 2,
+      "toolCalls": 1,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "0 snapshots returned",
+          "tool": true,
+          "status": "outage",
+          "sources": []
+        },
+        {
+          "step": 2,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-outage-2-2",
+      "caseId": "v7-outage",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 7 supports Node.js 22.12.0.",
+      "target": "Vite 7",
+      "condition": "source outage",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 4876.2011,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 160,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "0 snapshots returned",
+          "tool": true,
+          "status": "outage",
+          "sources": []
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-0Ju1vyg8S6BiavGaMzakAk6gf5SFNxrm"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-default-2-0",
+      "caseId": "v6-default",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.3463,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'modules'",
+          "tool": true,
+          "url": "https://v6.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-default-2-1",
+      "caseId": "v6-default",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.4006,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "The default build.target in Vite 6 is 'modules'.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 6",
+              "title": "Vite 6 build options · build.target",
+              "url": "https://v6.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'modules'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-default-2-2",
+      "caseId": "v6-default",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 507.3629,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 364,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-nYesURpTH5SfHKnXXRh5Iotmj12xCCZ8"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-old-default-2-0",
+      "caseId": "v7-old-default",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "supported",
+      "success": false,
+      "latencyMs": 0.3138,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'modules'",
+          "tool": true,
+          "url": "https://v6.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-old-default-2-1",
+      "caseId": "v7-old-default",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "contradicted",
+      "success": true,
+      "latencyMs": 0.3103,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This guidance matches Vite 6. The default build.target in Vite 7 is 'baseline-widely-available'.",
+          "tool": false,
+          "verdict": "superseded",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7 build options · build.target",
+              "url": "https://v7.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'baseline-widely-available'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6 build options · build.target",
+              "url": "https://v6.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'modules'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "superseded",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-old-default-2-2",
+      "caseId": "v7-old-default",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "The default build.target is 'modules'.",
+      "target": "Vite 7",
+      "condition": "older result first",
+      "expected": "contradicted",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 480.3214,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 364,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-LjydfJdDfYk2wuivj0gGvc6bXijqNqzN"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-default-2-0",
+      "caseId": "v7-default",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "The default build.target is 'baseline-widely-available'.",
+      "target": "Vite 7",
+      "condition": "older source timeout",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.5493,
+      "steps": 4,
+      "toolCalls": 3,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Read older source",
+          "detail": "Injected timeout for the Vite 6 snapshot",
+          "tool": true,
+          "status": "timeout"
+        },
+        {
+          "step": 2,
+          "action": "Search release index",
+          "detail": "1 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'baseline-widely-available'",
+          "tool": true,
+          "url": "https://v7.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-default-2-1",
+      "caseId": "v7-default",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "The default build.target is 'baseline-widely-available'.",
+      "target": "Vite 7",
+      "condition": "older source timeout",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.7601,
+      "steps": 5,
+      "toolCalls": 3,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Read older source",
+          "detail": "Injected timeout for the Vite 6 snapshot",
+          "tool": true,
+          "status": "timeout"
+        },
+        {
+          "step": 2,
+          "action": "Search release index",
+          "detail": "1 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 4,
+          "action": "Inspect cited evidence",
+          "detail": "The default build.target in Vite 7 is 'baseline-widely-available'.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7 build options · build.target",
+              "url": "https://v7.vite.dev/config/build-options#build-target",
+              "excerpt": "The default value is a Vite special value, 'baseline-widely-available'",
+              "published_at": null,
+              "retrieved_at": "2026-11-18T02:02:02Z"
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 1
+            }
+          ]
+        },
+        {
+          "step": 5,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-default-2-2",
+      "caseId": "v7-default",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "The default build.target is 'baseline-widely-available'.",
+      "target": "Vite 7",
+      "condition": "older source timeout",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 526.1373,
+      "steps": 5,
+      "toolCalls": 3,
+      "tokens": 268,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Read older source",
+          "detail": "Injected timeout for the Vite 6 snapshot",
+          "tool": true,
+          "status": "timeout"
+        },
+        {
+          "step": 2,
+          "action": "Search release index",
+          "detail": "1 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 3,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 4,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-9ARRlbhB75nGq8rprIQFUmBEfnt9bnsP"
+        },
+        {
+          "step": 5,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node20-2-0",
+      "caseId": "v7-node20",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Node.js 20 is supported.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "contradicted",
+      "success": false,
+      "latencyMs": 0.325,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first manifest",
+          "detail": "^20.19.0 || >=22.12.0",
+          "tool": true,
+          "url": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "contradicted",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node20-2-1",
+      "caseId": "v7-node20",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Node.js 20 is supported.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.3413,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "The named major spans both supported and unsupported versions. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "unknown",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-node20-2-2",
+      "caseId": "v7-node20",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Node.js 20 is supported.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 493.0123,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 530,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-57oE3suaw7vakrn6a5hIRati8ofMfMI4"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-dropped-2-0",
+      "caseId": "v7-dropped",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Vite 7 dropped support for Node.js 18.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "unknown",
+      "success": false,
+      "latencyMs": 0.5723,
+      "steps": 2,
+      "toolCalls": 1,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-dropped-2-1",
+      "caseId": "v7-dropped",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Vite 7 dropped support for Node.js 18.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 0.8752,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 7",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later. Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later.",
+          "tool": false,
+          "verdict": "supported",
+          "evidence": [
+            {
+              "target": "Vite 7",
+              "title": "Vite 7.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+              "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+              "published_at": "2025-06-24",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^20.19.0 || >=22.12.0\""
+            },
+            {
+              "target": "Vite 6",
+              "title": "Vite 6.0 release announcement · Node.js support",
+              "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+              "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+              "published_at": "2024-11-26",
+              "retrieved_at": "2026-11-18T02:02:02Z",
+              "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+              "engine_excerpt": "\"node\": \"^18.0.0 || ^20.0.0 || >=22.0.0\""
+            }
+          ],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 2
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v7-dropped-2-2",
+      "caseId": "v7-dropped",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Vite 7 dropped support for Node.js 18.",
+      "target": "Vite 7",
+      "condition": "normal",
+      "expected": "supported",
+      "answer": "supported",
+      "success": true,
+      "latencyMs": 536.8474,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 535,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://vite.dev/blog/announcing-vite7#node-js-support",
+            "https://vite.dev/blog/announcing-vite6#node-js-support"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-JQvEEUjUakqECZayfLkJ40SwMdLsedoc"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "supported",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-duration-2-0",
+      "caseId": "v6-duration",
+      "agent": "First-result reader",
+      "repeat": 2,
+      "task": "Production builds finish in two seconds.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.3039,
+      "steps": 3,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Read first build guide",
+          "detail": "The default value is a Vite special value, 'modules'",
+          "tool": true,
+          "url": "https://v6.vite.dev/config/build-options#build-target"
+        },
+        {
+          "step": 3,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-duration-2-1",
+      "caseId": "v6-duration",
+      "agent": "Version-aware verifier",
+      "repeat": 2,
+      "task": "Production builds finish in two seconds.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 0.3278,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Verify release claim",
+          "detail": "Vite 6",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Inspect cited evidence",
+          "detail": "This verifier has no matching check for this statement in its versioned evidence.",
+          "tool": false,
+          "verdict": "unknown",
+          "evidence": [],
+          "operations": [
+            {
+              "operation": "read_snapshot",
+              "status": "ok",
+              "sources": 0
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "v6-duration-2-2",
+      "caseId": "v6-duration",
+      "agent": "Bifrost · openai/quorum-qwen",
+      "repeat": 2,
+      "task": "Production builds finish in two seconds.",
+      "target": "Vite 6",
+      "condition": "normal",
+      "expected": "unknown",
+      "answer": "unknown",
+      "success": true,
+      "latencyMs": 501.9354,
+      "steps": 4,
+      "toolCalls": 2,
+      "tokens": 362,
+      "costUsd": null,
+      "trace": [
+        {
+          "step": 1,
+          "action": "Search release index",
+          "detail": "2 snapshots returned",
+          "tool": true,
+          "status": "ok",
+          "sources": [
+            "https://v6.vite.dev/config/build-options#build-target",
+            "https://v7.vite.dev/config/build-options#build-target"
+          ]
+        },
+        {
+          "step": 2,
+          "action": "Call Bifrost",
+          "detail": "openai/quorum-qwen",
+          "tool": true
+        },
+        {
+          "step": 3,
+          "action": "Receive completion",
+          "detail": "quorum-qwen",
+          "tool": false,
+          "requestId": "chatcmpl-XMYzEF0ASWb01xkiTg0IDXjv4GEBS6BE"
+        },
+        {
+          "step": 4,
+          "action": "Submit verdict",
+          "detail": "unknown",
+          "tool": false
+        }
+      ],
+      "error": null
+    }
+  ],
+  "summary": [
+    {
+      "agent": "First-result reader",
+      "runs": 24,
+      "passed": 14,
+      "successRate": 0.5833333333333334,
+      "avgLatencyMs": 0.4630958333333333,
+      "avgSteps": 2.9166666666666665,
+      "avgToolCalls": 1.9166666666666667,
+      "tokens": 0,
+      "costUsd": 0,
+      "consistencyRate": 1.0
+    },
+    {
+      "agent": "Version-aware verifier",
+      "runs": 24,
+      "passed": 24,
+      "successRate": 1.0,
+      "avgLatencyMs": 4.349254166666666,
+      "avgSteps": 3.9166666666666665,
+      "avgToolCalls": 2,
+      "tokens": 0,
+      "costUsd": 0,
+      "consistencyRate": 1.0
+    },
+    {
+      "agent": "Bifrost · openai/quorum-qwen",
+      "runs": 24,
+      "passed": 13,
+      "successRate": 0.5416666666666666,
+      "avgLatencyMs": 8115.306245833333,
+      "avgSteps": 4.083333333333333,
+      "avgToolCalls": 2.0833333333333335,
+      "tokens": 10516,
+      "costUsd": null,
+      "consistencyRate": 0.9166666666666666
+    }
+  ],
+  "protocol": {
+    "workload": "Twelve closed-corpus Vite runtime, migration and build claims. Conditions include reordered results, a simulated single-source timeout, and a full source outage.",
+    "scoring": "Exact target-release verdict. Superseded counts as contradicted. Source outage requires abstention.",
+    "consistency": "Fraction of tasks with the same verdict and no errors across all repetitions.",
+    "metrics": "Steps are trace events. Tool calls count harness-observed searches, manifest reads and adapter calls. Internal adapter operations are outside this count. Latency is observed wall time. Unknown provider tokens and USD remain null."
+  },
+  "provenance": {
+    "startedAt": "2026-11-18T02:25:41+00:00",
+    "finishedAt": "2026-11-18T02:28:56+00:00",
+    "gateway": "Bifrost v2.4.0",
+    "inference": "llama.cpp b12492 on local CPU",
+    "model": "Qwen2.5-1.5B-Instruct Q4_K_M",
+    "modelAlias": "openai/quorum-qwen",
+    "modelSha256": "1adf0b11065d8ad2e8123ea110d1ec956dab4ab038eab665614adba04b6c3370",
+    "corpus": "vite_evidence.json",
+    "generation": {
+      "temperature": 0,
+      "maxTokens": 96
+    },
+    "billing": "Local CPU inference. Provider cost is shown only when it was reported."
+  }
+}

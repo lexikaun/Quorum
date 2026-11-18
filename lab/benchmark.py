@@ -104,7 +104,8 @@ def scoped_verifier(trial):
     from .verifier import verify
 
     trial.record("Verify release claim", trial.target, tool=True)
-    result = verify(trial.task, trial.target, "replay")
+    visible_urls = {source["url"] for source in sources}
+    result = verify(trial.task, trial.target, "replay", replay_sources=visible_urls)
     claim = result["claims"][0]
     trial.record("Inspect cited evidence", claim["reason"], verdict=claim["verdict"],
                  evidence=claim["evidence"], operations=result.get("trace", []))
@@ -158,7 +159,9 @@ def _remote_agent(url, key, model=None):
             trial.tokens = _quantity(usage.get("total_tokens"), integer=True)
             cost = usage.get("cost")
             trial.cost = _quantity(cost.get("total_cost") if isinstance(cost, dict) else cost)
-            answer = json.loads(response["choices"][0]["message"]["content"])
+            content = response["choices"][0]["message"]["content"].strip()
+            fence = re.fullmatch(r"```(?:json)?\s*\n(.*?)\n```", content, flags=re.I | re.S)
+            answer = json.loads(fence[1] if fence else content)
         else:
             answer = _post(url, key, packet)
             trial.tokens = _quantity(answer.get("tokens"), integer=True)

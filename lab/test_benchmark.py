@@ -98,7 +98,7 @@ class BenchmarkTests(unittest.TestCase):
                 return 503, {"error":"unavailable"}
             if request.get("max_tokens") != 96 or request.get("temperature") != 0:
                 return 400, {"error": "missing generation limits"}
-            return 200, {"id":"chat-test-73","choices":[{"message":{"content":'{"answer":"unknown"}'}}],
+            return 200, {"id":"chat-test-73","choices":[{"message":{"content":'```json\n{"answer":"unknown"}\n```'}}],
                          "usage":{"total_tokens":13, "cost":{"total_cost":0.002}}}
 
         with local_endpoint(respond) as endpoint, patch.dict(os.environ, {
