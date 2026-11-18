@@ -4,6 +4,10 @@
 
 From the repository root, run `python -m lab.server` and open [Quorum Lab](http://127.0.0.1:8765/). This uses Python 3.10+ and the standard library. Local replay, the two built-in benchmark agents, and the recorded Bifrost results work without credentials. Stop the server with Ctrl+C.
 
+## Short presentation
+
+Show the Vite 7 receipts in **Freshness verifier**. Open the Node.js 18 sources and switch to Vite 6. Then open **Agent benchmark**, run 1 repeat with the two local agents, and open the recorded Bifrost run to show the gateway trace and token totals. Use the recorded result during a timed pitch so you can inspect the trace immediately. Say **Official docs** for the direct-source Vite check and **Tavily search** only if you run the authenticated Tavily mode.
+
 ## Tavily 01. Verify a time-sensitive claim
 
 1. Open **Freshness verifier** and select **Use example** if the answer field is empty.

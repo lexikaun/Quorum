@@ -137,7 +137,7 @@ app/.venv/Scripts/python.exe -m pytest app/tests -q
 | `deck/` | Pitch deck (`Quorum-Pitch.pptx`) and its generator |
 | `video/` | The showcase film as code |
 
-Run the demo (Windows, PowerShell):
+Run the original two-device demo on Windows from a short checkout path such as `C:/src/Quorum`. Qdrant hub storage can fail in a deeply nested checkout.
 
 ```powershell
 .\scripts\fetch_hub.ps1        # once: Qdrant server binary

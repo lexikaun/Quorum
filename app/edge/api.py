@@ -58,6 +58,7 @@ class ResolveBody(BaseModel):
 
 class ReviewBody(BaseModel):
     claim_ids: list[str] = Field(min_length=1, max_length=32)
+    claim_versions: dict[str, int] = Field(default_factory=dict, max_length=32)
     target: Literal["Vite 6", "Vite 7"]
     as_of: str | None = None
 
@@ -146,9 +147,10 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
 
     @app.get("/api/freshness-reviews/{claim_id}")
     def reviews(claim_id: str):
-        if ctx.memory.get(claim_id) is None:
+        claim = ctx.memory.get(claim_id)
+        if claim is None:
             raise HTTPException(404, "Unknown local claim.")
-        return {"reviews": ctx.store.kv_get("reviews:" + claim_id, [])}
+        return {"current_version": claim["version"], "reviews": ctx.store.kv_get("reviews:" + claim_id, [])}
 
     @app.post("/api/freshness-reviews")
     def save_reviews(body: ReviewBody):
@@ -158,6 +160,8 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
             claim = ctx.memory.get(cid)
             if claim is None:
                 raise HTTPException(404, "Unknown local claim.")
+            if body.claim_versions.get(cid, claim["version"]) != claim["version"]:
+                raise HTTPException(409, "A cited claim changed. Ask Quorum again before saving.")
             try:
                 check = verify(claim["text"], body.target, "replay", as_of=body.as_of)
             except ValueError as exc:

@@ -132,7 +132,7 @@ Runs at ingest (new local claim) **and** at sync (each newly pulled claim). Same
 | `GET /api/state` | - | `{device, display_name, today, sync, claims:[claim+sync+xyz], conflicts:[...], activity:[...last 60], peers:{tanishk:"http://127.0.0.1:8001", lakshya:"http://127.0.0.1:8002"}}` |
 | `GET /api/events` | - | SSE stream; each message `data: {"type": ..., "data": ...}` |
 | `POST /api/ingest` | `{kind: "note"\|"email"\|"whatsapp", text, author?, ref?, at?}` | `{claims:[...], conflicts:[...], took_ms, extractor:"llm"\|"fallback"}` |
-| `POST /api/ask` | `{q, view: "mine"\|"team"}` | `{answer, citations:[{claim_id, kind, author, excerpt, at}], disputed, hits:[{claim, score}], took_ms}` |
+| `POST /api/ask` | `{q, view: "mine"\|"team"}` | `{answer, citations:[{claim_id, version, kind, author, excerpt, at}], disputed, hits:[{claim, score}], took_ms}` |
 | `POST /api/net` | `{online: bool}` | sync status |
 | `POST /api/conflicts/{id}/resolve` | `{winner_claim_id}` | conflict |
 | `POST /api/conflicts/{id}/draft` | - | `{to, text, mailto, wa_link}` (opens only if the user clicks; nothing is sent by the app) |

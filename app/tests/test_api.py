@@ -428,3 +428,21 @@ def test_local_review_checks_original_claim_and_keeps_version_context(make_clien
     assert len(saved) == 2 and ctx.store.outbox_ids() == set()
     assert ctx.memory.get(ids[0])["status"] == "active"
     assert client.post("/api/freshness-reviews", json={"claim_ids": ["missing"], "target": "Vite 7"}).status_code == 404
+
+def test_freshness_reviews_follow_the_cited_claim_revision(make_client):
+    client, ctx = make_client()
+    claim = make_claim("Vite", "runtime", "18", "Node.js 18 is supported.", tier="device")
+    ctx.memory.add_claim(claim)
+    cid = claim["claim_id"]
+    first = client.post("/api/freshness-reviews", json={"claim_ids": [cid], "target": "Vite 7"})
+    assert first.status_code == 200
+    ctx.memory.update_fields(cid, text="Node.js 22.12 is supported.")
+    updated = client.post("/api/ask", json={"q": "Node.js", "view": "mine"}).json()["citations"][0]
+    assert updated["version"] == claim["version"] + 1
+    path = "/api/freshness-reviews/" + cid
+    receipt = client.get(path).json()
+    assert receipt["current_version"] == updated["version"]
+    assert receipt["reviews"][0]["version"] == claim["version"]
+    stale = client.post("/api/freshness-reviews", json={
+        "claim_ids": [cid], "claim_versions": {cid: claim["version"]}, "target": "Vite 7"})
+    assert stale.status_code == 409

@@ -43,7 +43,10 @@ async function request(path, payload) {
   const options = payload ? {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(payload)} : {};
   const response = await fetch(path, options);
   const result = await response.json().catch(() => null);
-  if (!response.ok || !result) throw new Error(result?.error || "The lab server could not complete this request. Try again.");
+  if (!response.ok || !result) {
+    const detail = typeof result?.detail === "string" ? result.detail : "";
+    throw new Error(result?.error || detail || "The lab server could not complete this request. Try again.");
+  }
   return result;
 }
 function download(data, filename) {
@@ -119,7 +122,7 @@ function loadImport() {
         if (onDevice && typeof item.claim_id === "string" && item.claim_id) {
           const node = element("div", "Looking for saved checks…", "saved-check");
           li.append(node);
-          if (!citationViews.has(item.claim_id)) citationViews.set(item.claim_id, {nodes: [], reviews: []});
+          if (!citationViews.has(item.claim_id)) citationViews.set(item.claim_id, {nodes: [], reviews: [], citedVersion: item.version});
           citationViews.get(item.claim_id).nodes.push(node);
         }
       }
@@ -131,10 +134,11 @@ function loadImport() {
 }
 function showSavedChecks() {
   for (const view of citationViews.values()) {
-    const matches = view.reviews.filter(review => review.target === byId("target").value && (review.as_of || "") === byId("as-of").value);
+    const revision = view.citedVersion ?? view.currentVersion;
+    const matches = view.reviews.filter(review => review.version === revision && review.target === byId("target").value && (review.as_of || "") === byId("as-of").value);
     const latest = matches.sort((a, b) => String(b.checked_at).localeCompare(String(a.checked_at)))[0];
     const verdicts = latest?.claims?.map(claim => claim.verdict).filter(Boolean).join(", ");
-    const note = view.error ? "Saved checks unavailable." : latest ? ["Last saved check", latest.checked_at, verdicts].filter(Boolean).join(" · ") : "No saved check for this target and date.";
+    const note = view.error ? "Saved checks unavailable." : latest ? ["Last saved check", latest.version !== view.currentVersion ? "Older claim revision" : "", latest.checked_at, verdicts].filter(Boolean).join(" · ") : "No saved check for this target and date.";
     for (const node of view.nodes) {
       node.replaceChildren(element("p", note));
       if (view.error || !latest?.claims?.length) continue;
@@ -155,6 +159,7 @@ async function refreshSavedChecks() {
     try {
       const response = await request("../api/freshness-reviews/" + encodeURIComponent(id));
       view.reviews = response.reviews || [];
+      view.currentVersion = response.current_version;
       view.error = false;
     } catch { view.error = true; }
   }));
@@ -170,7 +175,8 @@ async function saveChecks() {
   btn.disabled = true;
   feedback("save-status", "Checking the stored claims on this device…");
   try {
-    await request("../api/freshness-reviews", {claim_ids: [...citationViews.keys()], target: byId("target").value, as_of: byId("as-of").value || null});
+    const claim_versions = Object.fromEntries([...citationViews].map(([id, view]) => [id, view.citedVersion ?? view.currentVersion]).filter(([, version]) => Number.isInteger(version)));
+    await request("../api/freshness-reviews", {claim_ids: [...citationViews.keys()], claim_versions, target: byId("target").value, as_of: byId("as-of").value || null});
     await refreshSavedChecks();
     if (revision === verifyRevision) feedback("save-status", "Checks saved to the cited claims on this device.");
   } catch (error) {
@@ -429,7 +435,7 @@ async function benchmark(event, recorded = false) {
   btn.disabled = true;
   byId("load-recorded").disabled = true;
   byId("repeats").disabled = true;
-  feedback("bench-status", recorded ? "Loading recorded run…" : "Running benchmark…");
+  feedback("bench-status", recorded ? "Loading recorded run…" : modelAvailable ? "Running benchmark with Bifrost. Local inference can take a few minutes." : "Running benchmark…");
   try {
     const result = recorded ? await api("recorded-benchmark") : await api("benchmark", {repeats: Number(byId("repeats").value)});
     showBenchmark(result, recorded);

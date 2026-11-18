@@ -135,6 +135,7 @@ def _citations(claims: list[dict]) -> list[dict]:
         src = c.get("source") or {}
         out.append({
             "claim_id": c["claim_id"],
+            "version": c.get("version"),
             "kind": src.get("kind"),
             "author": src.get("author"),
             "excerpt": src.get("excerpt") or c.get("text"),

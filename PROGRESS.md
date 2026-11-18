@@ -16,6 +16,13 @@ Submission deadline confirmed by the team as **21 November 2026**. Development i
 
 - A fresh 36-trial benchmark through the local gateway completed with 12 Bifrost responses, no transport or parse errors, and 5,258 reported tokens. On this run the first-result reader passed 7 of 12, the version-aware verifier 12 of 12, and Qwen 6 of 12.
 
+## Final rehearsal
+
+- Passed 26 lab tests and 160 device tests. Two optional Ollama tests were skipped.
+- The original two-device demo passed all 47 checks from a clean, short-path Windows checkout, including offline capture, synchronization, conflict resolution, and device-only data isolation. Qdrant reported a storage-path error from a deeply nested checkout. The README records the working setup.
+- The mounted browser flow verified both release scopes, saved cited claim revisions, and loaded their receipts after a reload. The audit fixed a regression where an older claim revision could be presented as the freshly cited one. The API rejects saves against stale citations.
+- Standalone browser checks covered live official Vite sources, Public web against the loopback providers, benchmark JSON export, and both demo views at desktop and phone widths. The browser also completed a fresh 36-trial run through local Bifrost. It received all 12 model responses with 5,258 reported tokens and no transport or parse errors. The benchmark defaults to one repeat and reports that inference can take a few minutes.
+
 ## Remaining verification
 
 Real Tavily API calls require authorized credentials and can consume credits. No paid provider calls, public deployment or hackathon submission were made. For a real Tavily demonstration, follow the provider configuration in the demo guide when authorized to use an account key.

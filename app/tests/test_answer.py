@@ -57,7 +57,7 @@ def test_other_questions_answer_with_top_hits_and_cite_them():
     out = answer.compose("where is the Pangong shoot?", [(a, 0.03), (b, 0.02)], [], CFG)
     assert out["answer"] == "Pangong shoot is at the lake shore. Lakshya is leading the Pangong shoot."
     assert {c["claim_id"] for c in out["citations"]} == {a["claim_id"], b["claim_id"]}
-    assert set(out["citations"][0]) == {"claim_id", "kind", "author", "excerpt", "at"}
+    assert set(out["citations"][0]) == {"claim_id", "version", "kind", "author", "excerpt", "at"}
 
 
 def test_no_hits_says_so_without_inventing_anything():
