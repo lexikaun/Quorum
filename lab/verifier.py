@@ -113,15 +113,18 @@ def _assess(parsed, source):
     return negated
 
 
+TAVILY_ENDPOINT = "https://api.tavily.com"
+
+
 def _tavily(endpoint, body, key):
     req = urllib.request.Request(
-        "https://api.tavily.com/" + endpoint, data=json.dumps(body).encode(),
+        TAVILY_ENDPOINT + "/" + endpoint, data=json.dumps(body).encode(),
         headers={"Content-Type": "application/json", "Authorization": "Bearer " + key},
         method="POST",
     )
     try:
         with urllib.request.urlopen(req, timeout=20) as response:
-            data = json.load(response)
+            data = json.loads(response.read(1_000_001))
     except (OSError, ValueError):
         raise ValueError(f"Tavily {endpoint} could not retrieve evidence.") from None
     if not isinstance(data, dict) or not isinstance(data.get("results"), list):
@@ -299,7 +302,9 @@ def _receipt(statement, parsed, reason, target, sources, as_of):
 
 def verify(text, target="Vite 7", mode="replay", as_of=None, *, replay_sources=None):
     """Return evidence receipts. Score measures target support, and unknown has no score."""
-    if target not in TARGETS or mode not in ("replay", "public", "live"):
+    if target == "Public web" and mode != "live":
+        raise ValueError("Public web requires live mode.")
+    if target not in (*TARGETS, "Public web") or mode not in ("replay", "public", "live"):
         raise ValueError("Select Vite 6 or Vite 7 and replay, public or live mode.")
     if replay_sources is not None and mode != "replay":
         raise ValueError("The replay source filter applies only to replay mode.")
@@ -310,6 +315,9 @@ def verify(text, target="Vite 7", mode="replay", as_of=None, *, replay_sources=N
             raise ValueError("as_of must be a UTC date in YYYY-MM-DD format.")
         date.fromisoformat(as_of)
     timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    if target == "Public web":
+        from .public_web import verify_public
+        return verify_public(text, as_of, timestamp, _tavily)
     statements = [claim for sentence in _statements(text) for claim in _split_claims(sentence, target)]
     if not statements:
         raise ValueError("Paste at least one statement to verify.")
