@@ -128,7 +128,9 @@ def _tavily(endpoint, body, key):
             if len(raw) > 1_000_000:
                 raise ValueError("Evidence response exceeds the size limit.")
             data = json.loads(raw)
-    except (OSError, ValueError):
+    except (OSError, ValueError) as exc:
+        if isinstance(exc, urllib.error.HTTPError):
+            exc.close()
         raise ValueError(f"Tavily {endpoint} could not retrieve evidence.") from None
     if not isinstance(data, dict) or not isinstance(data.get("results"), list):
         raise ValueError(f"Tavily {endpoint} returned an invalid evidence response.")

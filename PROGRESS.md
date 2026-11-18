@@ -14,6 +14,8 @@ Submission deadline confirmed by the team as **21 November 2026**. Development i
 - Browser checks covered the mounted question, three citations, verification for both Vite releases, save and reload, a 24-trial fresh benchmark, recorded Bifrost results and JSON download.
 - Public web was exercised in a real browser against loopback Tavily and Bifrost fixtures. The suite also verifies that a Tavily outage produces an unknown receipt without calling the judge. Official docs mode fetched live Vite sources and returned superseded for Node 18 and supported for Node 22.12 under Vite 7.
 
+- A fresh 36-trial benchmark through the local gateway completed with 12 Bifrost responses, no transport or parse errors, and 5,258 reported tokens. On this run the first-result reader passed 7 of 12, the version-aware verifier 12 of 12, and Qwen 6 of 12.
+
 ## Remaining verification
 
 Real Tavily API calls require authorized credentials and can consume credits. No paid provider calls, public deployment or hackathon submission were made. For a real Tavily demonstration, follow the provider configuration in the demo guide when authorized to use an account key.
