@@ -2,7 +2,7 @@
 # This machine exports UV_CACHE_DIR / PIP_CACHE_DIR / HF_HOME globally (pointing at another
 # project's caches), and env vars beat uv.toml, so this override is required, not optional.
 # Caches go to the MAIN checkout's .cache/ and models/ so every worktree shares them.
-export QUORUM_ROOT='X:/Projects_X/code_cubicle_6'
+export QUORUM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export UV_CACHE_DIR="$QUORUM_ROOT/.cache/uv"
 export PIP_CACHE_DIR="$QUORUM_ROOT/.cache/pip"
 export npm_config_cache="$QUORUM_ROOT/.cache/npm"

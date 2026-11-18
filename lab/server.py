@@ -28,10 +28,12 @@ def dispatch(path, data):
         if not isinstance(text, str) or not 1 <= len(text.strip()) <= 6000:
             raise ValueError("Enter 1 to 6,000 characters.")
         target, mode = data.get("target", "Vite 7"), data.get("mode", "replay")
-        if target not in ("Vite 6", "Vite 7") or mode not in ("replay", "live"):
+        if target not in ("Vite 6", "Vite 7", "Public web") or mode not in ("replay", "public", "live"):
             raise ValueError("Choose a listed target and evidence mode.")
         if mode == "live" and not status()["live_available"]:
             raise ValueError("Live search requires TAVILY_API_KEY on the server.")
+        if target == "Public web" and (mode != "live" or not status()["bifrost_available"]):
+            raise ValueError("Public web requires Tavily live mode and a configured Bifrost model.")
         from .verifier import verify
         as_of = data.get("as_of")
         if as_of is not None and (not isinstance(as_of, str) or len(as_of) != 10):
@@ -55,6 +57,8 @@ def application(env, start_response):
     if method == "GET":
         if path == "/api/status":
             return respond("200 OK", status())
+        if path == "/api/recorded-benchmark":
+            return respond("200 OK", (WEB.parent / "fixtures/local_bifrost_run.json").read_bytes())
         if path in ASSETS:
             filename, mime = ASSETS[path]
             return respond("200 OK", (WEB / filename).read_bytes(), mime)

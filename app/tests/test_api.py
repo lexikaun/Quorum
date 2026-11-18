@@ -406,3 +406,25 @@ def test_event_bus_fans_out_across_threads_with_heartbeat():
     message, heartbeat, during, after = asyncio.run(scenario())
     assert message == {"type": "claim", "data": {"claim_id": "clm_1"}}
     assert heartbeat is None and (during, after) == (1, 0)
+
+
+def test_device_serves_freshness_lab(make_client):
+    client, _ = make_client()
+    response = client.get("/lab/api/status")
+    assert response.status_code == 200
+    assert isinstance(response.json()["live_available"], bool)
+
+def test_local_review_checks_original_claim_and_keeps_version_context(make_client):
+    client, ctx = make_client()
+    claim = make_claim("Vite", "runtime", "18", "Node.js 18 is supported.", tier="device")
+    ctx.memory.add_claim(claim)
+    ids = [claim["claim_id"]]
+    for target in ("Vite 6", "Vite 7", "Vite 7"):
+        result = client.post("/api/freshness-reviews", json={"claim_ids": ids, "target": target})
+        assert result.status_code == 200
+    saved = client.get("/api/freshness-reviews/" + ids[0]).json()["reviews"]
+    assert {r["target"]: r["claims"][0]["verdict"] for r in saved} == {
+        "Vite 6": "supported", "Vite 7": "superseded"}
+    assert len(saved) == 2 and ctx.store.outbox_ids() == set()
+    assert ctx.memory.get(ids[0])["status"] == "active"
+    assert client.post("/api/freshness-reviews", json={"claim_ids": ["missing"], "target": "Vite 7"}).status_code == 404

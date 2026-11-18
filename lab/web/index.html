@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#192c48">
+  <title>Freshness verifier · Quorum</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to workspace</a>
+  <header class="mast">
+    <div class="mast-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Quorum<span class="brand-sub">Lab</span></div>
+      <nav aria-label="Lab views">
+        <a href="#verifier" id="verify-link" aria-current="page">Freshness verifier</a>
+        <a href="#benchmark" id="bench-link">Agent benchmark</a>
+      </nav>
+      <a href="../" class="back" id="back-link" hidden>Team memory <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <section id="verifier" aria-labelledby="verify-title">
+      <div class="intro">
+        <div><h1 id="verify-title">Freshness verifier</h1>
+        <p>Check each claim against versioned sources and see what changed.</p></div>
+        <div class="folio" aria-hidden="true"><i></i><i></i><i></i><b>✓</b></div>
+      </div>
+      <div class="workspace">
+        <form id="verify-form" class="config">
+          <h2>Answer to verify</h2>
+          <div id="import-panel" class="import-panel" hidden>
+            <strong>From Quorum memory</strong>
+            <p>This answer stays in local replay. Clear it to start a public check.</p>
+            <details><summary>Local citations <span id="cite-count"></span></summary><ul id="citations"></ul></details>
+            <button class="text-btn" type="button" id="clear-import">Clear imported answer</button>
+          </div>
+          <div class="field-heading"><label for="answer">Answer text</label><button type="button" class="text-btn" id="use-example">Use example</button></div>
+          <textarea id="answer" rows="4" maxlength="6000" required aria-describedby="answer-hint">Node.js 18 is supported. Node.js 22.12 is supported. Node.js 16 is supported. Builds finish in two seconds.</textarea>
+          <p class="hint" id="answer-hint">Enter the claims you want to check, one sentence at a time.</p>
+          <div class="scope-controls">
+            <div><label for="target">Verification target</label>
+            <select id="target"><option>Vite 6</option><option selected>Vite 7</option><option id="public-target" disabled>Public web</option></select></div>
+            <div><label for="as-of">As of date <span class="optional">(optional)</span></label>
+            <input type="date" id="as-of" title="Limit evidence to sources available by this date"></div>
+          </div>
+          <p class="hint" id="target-hint">Public web checks require Tavily and a configured model.</p>
+          <fieldset><legend>Evidence source</legend>
+            <div class="mode-group">
+              <label><input type="radio" name="mode" value="replay" checked><span>Local replay</span></label>
+              <label><input type="radio" name="mode" value="public" id="public-mode"><span>Official docs</span></label>
+              <label><input type="radio" name="mode" value="live" id="live-mode" disabled><span>Tavily search</span></label>
+            </div>
+          </fieldset>
+          <p class="hint" id="mode-hint">Local replay uses saved source excerpts.</p>
+          <p class="notice" id="live-notice" hidden></p>
+          <button class="primary" id="verify-submit">Verify answer</button>
+          <p class="feedback" id="verify-status" role="status"></p>
+          <button class="recorded" id="save-checks" type="button" hidden>Save checks to this device</button>
+          <p class="feedback" id="save-status" role="status"></p>
+        </form>
+        <section class="output" aria-labelledby="evidence-heading" id="evidence-output">
+          <div class="output-head"><h2 id="evidence-heading">Evidence receipts</h2><button type="button" class="export" id="verify-export" disabled>Download JSON</button></div>
+          <p class="result-meta" id="verify-meta"></p>
+          <div id="receipts"><p class="empty">Verify an answer to see its claims and sources here.</p></div>
+          <div id="verify-trace"></div>
+        </section>
+      </div>
+    </section>
+    <section id="benchmark" aria-labelledby="bench-title" hidden>
+      <div class="intro">
+        <div><h1 id="bench-title">Agent benchmark</h1>
+        <p>Compare agents on the same tasks. Inspect their answers, tool calls, and traces across repeated runs.</p></div>
+        <div class="folio meter" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+      <div class="workspace">
+        <form id="bench-form" class="config">
+          <h2>Benchmark setup</h2>
+          <label for="repeats">Repeats per case</label>
+          <select id="repeats"><option value="1">1 repeat</option><option value="3" selected>3 repeats</option><option value="5">5 repeats</option></select>
+          <p class="hint">Each agent runs the same case once per repeat.</p>
+          <div class="env"><span class="dot"></span><strong>Fixed workload</strong><p>Runs use the bundled tasks and source fixtures.</p></div>
+          <p id="bifrost" class="hint"></p>
+          <button class="primary" id="bench-submit">Run benchmark</button>
+          <button class="recorded" id="load-recorded" type="button">View recorded Bifrost run</button>
+          <p class="feedback" id="bench-status" role="status"></p>
+        </form>
+        <section class="output" aria-labelledby="bench-heading">
+          <div class="output-head"><h2 id="bench-heading">Benchmark results</h2><button type="button" class="export" id="bench-export" disabled>Download JSON</button></div>
+          <p class="result-meta" id="bench-meta"></p>
+          <div id="bench-results"><p class="empty">Run the benchmark to compare agents and inspect individual traces.</p></div>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

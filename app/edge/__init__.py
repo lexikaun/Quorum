@@ -6,7 +6,7 @@ HF_HOME globally (pointing at another project's cache), so we overwrite it rathe
 import os
 from pathlib import Path
 
-QUORUM_ROOT = Path(os.environ.get("QUORUM_ROOT") or r"X:\Projects_X\code_cubicle_6")
+QUORUM_ROOT = Path(os.environ.get("QUORUM_ROOT") or Path(__file__).resolve().parents[2])
 MODELS_DIR = QUORUM_ROOT / "models"
 
 os.environ["HF_HOME"] = str(MODELS_DIR / "hf")

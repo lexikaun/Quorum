@@ -2,7 +2,7 @@
 # This machine exports UV_CACHE_DIR / PIP_CACHE_DIR / HF_HOME globally (pointing at another
 # project's caches), and env vars beat uv.toml, so this override is required, not optional.
 # Caches go to the MAIN checkout's .cache\ and models\ so every worktree shares them.
-$root = "X:\Projects_X\code_cubicle_6"
+$root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $env:QUORUM_ROOT              = $root
 $env:UV_CACHE_DIR             = Join-Path $root ".cache\uv"
 $env:PIP_CACHE_DIR            = Join-Path $root ".cache\pip"

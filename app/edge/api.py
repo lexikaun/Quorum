@@ -12,7 +12,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from starlette.middleware.wsgi import WSGIMiddleware
+
+from lab.server import application as lab_application
 
 from edge import answer, conflicts
 from edge import extract as extractor
@@ -51,6 +54,12 @@ class NetBody(BaseModel):
 
 class ResolveBody(BaseModel):
     winner_claim_id: str
+
+
+class ReviewBody(BaseModel):
+    claim_ids: list[str] = Field(min_length=1, max_length=32)
+    target: Literal["Vite 6", "Vite 7"]
+    as_of: str | None = None
 
 
 def build_ctx(cfg, *, embedder=None, store=None, sync=None) -> SimpleNamespace:
@@ -133,6 +142,37 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
             "took_ms": took_ms,
         }
 
+    review_lock = threading.Lock()
+
+    @app.get("/api/freshness-reviews/{claim_id}")
+    def reviews(claim_id: str):
+        if ctx.memory.get(claim_id) is None:
+            raise HTTPException(404, "Unknown local claim.")
+        return {"reviews": ctx.store.kv_get("reviews:" + claim_id, [])}
+
+    @app.post("/api/freshness-reviews")
+    def save_reviews(body: ReviewBody):
+        from lab.verifier import verify
+        receipts = []
+        for cid in dict.fromkeys(body.claim_ids):
+            claim = ctx.memory.get(cid)
+            if claim is None:
+                raise HTTPException(404, "Unknown local claim.")
+            try:
+                check = verify(claim["text"], body.target, "replay", as_of=body.as_of)
+            except ValueError as exc:
+                raise HTTPException(400, str(exc)) from exc
+            receipts.append({"claim_id": cid, "version": claim["version"], "target": body.target,
+                             "as_of": body.as_of, "checked_at": check["timestamp"], "claims": check["claims"]})
+        # Per-device SQLite only. Keep up to 12 distinct release/date/version checks per claim.
+        with review_lock:
+            for receipt in receipts:
+                key = "reviews:" + receipt["claim_id"]
+                saved = [r for r in ctx.store.kv_get(key, []) if any(
+                    r[field] != receipt[field] for field in ("version", "target", "as_of"))]
+                ctx.store.kv_set(key, [receipt, *saved[:11]])
+        return {"reviews": receipts}
+
     # ---- sync + conflicts ----------------------------------------------------------------
 
     @app.post("/api/net")
@@ -214,6 +254,7 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
 
     # Mounted last so /api/* wins. index.html uses relative asset paths, so the UI must resolve at
     # the root ("/" -> index.html, "/app.js") as well as under /web.
+    app.mount("/lab", WSGIMiddleware(lab_application), name="research-lab")
     app.mount("/web", StaticFiles(directory=WEB_DIR, html=True, check_dir=False), name="web")
     app.mount("/", StaticFiles(directory=WEB_DIR, html=True, check_dir=False), name="root")
     return app

@@ -610,6 +610,22 @@ export function createDeviceUI(root, opts = {}) {
       <div class="answer-text">${text}</div>
       <div class="answer-meta"><span class="took">${esc(Math.round(r.took_ms ?? 0))} ms, on this device</span>${offline ? '<span>no hub needed</span>' : ''}<span>${view === 'team' ? 'team view' : 'mine'}</span></div>
       ${cites ? `<div class="cites">${cites}</div>` : ''}`;
+    if (!stage && !opts.transport && r.citations?.length) {
+      const check = document.createElement('button');
+      check.className = 'btn';
+      check.textContent = 'Check claim freshness';
+      check.addEventListener('click', () => {
+        try {
+          sessionStorage.setItem('quorum-freshness-import', JSON.stringify({
+            text: r.answer, citations: r.citations,
+          }));
+          location.assign('/lab/');
+        } catch {
+          toast('This browser could not open the local evidence review.', 'red');
+        }
+      });
+      box.append(check);
+    }
   }
 
   el('answer').addEventListener('mouseover', e => { const b = e.target.closest('.cite'); if (b) cloud.highlight([b.dataset.claim], 2.5); });
