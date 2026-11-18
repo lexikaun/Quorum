@@ -10,9 +10,9 @@ Submission deadline confirmed by the team as **21 November 2026**. Development i
 
 ## Verified on 18 November 2026
 
-- Full lab discovery passed all 25 tests. Full device suite passed 159 tests and skipped 2 optional Ollama tests.
+- Full lab discovery passed all 26 tests. Full device suite passed 159 tests and skipped 2 optional Ollama tests.
 - Browser checks covered the mounted question, three citations, verification for both Vite releases, save and reload, a 24-trial fresh benchmark, recorded Bifrost results and JSON download.
-- Public web was exercised in a real browser against loopback Tavily and Bifrost fixtures. Official docs mode fetched live Vite sources and returned superseded for Node 18 and supported for Node 22.12 under Vite 7.
+- Public web was exercised in a real browser against loopback Tavily and Bifrost fixtures. The suite also verifies that a Tavily outage produces an unknown receipt without calling the judge. Official docs mode fetched live Vite sources and returned superseded for Node 18 and supported for Node 22.12 under Vite 7.
 
 ## Remaining verification
 

@@ -124,7 +124,10 @@ def _tavily(endpoint, body, key):
     )
     try:
         with urllib.request.urlopen(req, timeout=20) as response:
-            data = json.loads(response.read(1_000_001))
+            raw = response.read(1_000_001)
+            if len(raw) > 1_000_000:
+                raise ValueError("Evidence response exceeds the size limit.")
+            data = json.loads(raw)
     except (OSError, ValueError):
         raise ValueError(f"Tavily {endpoint} could not retrieve evidence.") from None
     if not isinstance(data, dict) or not isinstance(data.get("results"), list):

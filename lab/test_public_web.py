@@ -19,6 +19,7 @@ class PublicWebTests(unittest.TestCase):
     def setUp(self):
         self.calls = []
         self.bad_quote = False
+        self.extract_outage = False
         self.old_date = "2022-01-02"
         self.judge_verdict = "superseded"
         case = self
@@ -47,6 +48,9 @@ class PublicWebTests(unittest.TestCase):
                     result = {"results": [{"url": OLD, "published_date": case.old_date, "title": "2022 opening hours"},
                                           {"url": NEW, "published_date": "2024-02-03", "title": "2024 opening hours"}]}
                 elif self.path == "/extract":
+                    if case.extract_outage:
+                        self.send_error(503)
+                        return
                     result = {"results": [{"url": u, "raw_content": OLD_SPAN if u == OLD else NEW_SPAN}
                                           for u in data["urls"]]}
                 else:
@@ -102,3 +106,10 @@ class PublicWebTests(unittest.TestCase):
         with patch.dict(os.environ, TAVILY_API_KEY=""), self.assertRaises(ValueError):
             verify("public", "Public web", "live")
         self.assertEqual(self.calls, [])
+
+    def test_extract_outage_returns_unknown_without_calling_the_judge(self):
+        self.extract_outage = True
+        result = verify(OLD_SPAN, "Public web", "live")
+        self.assertEqual(result["claims"][0]["verdict"], "unknown")
+        self.assertFalse(result["claims"][0]["evidence"])
+        self.assertEqual([path for path, _ in self.calls], ["/v1/chat/completions", "/search", "/extract"])

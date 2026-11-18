@@ -142,7 +142,11 @@ def verify_public(text, as_of, timestamp, tavily):
         if not isinstance(item, dict) or not (claim := _string(item.get("text"), 600)):
             continue
         query = _string(item.get("query"), 300) or claim[:300]
-        sources = _retrieve(tavily, tavily_key, query, cutoff, as_of is not None, trace)
+        try:
+            sources = _retrieve(tavily, tavily_key, query, cutoff, as_of is not None, trace)
+        except ValueError:
+            sources = {}
+            trace.append({"operation": "tavily.evidence", "status": "unavailable"})
         try:
             result = _model(url, model, model_key, JUDGE, {"claim": claim, "as_of": cutoff,
                             "sources": [{"id": key, **source} for key, source in sources.items()]}) if sources else {}
