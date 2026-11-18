@@ -278,7 +278,7 @@ function receipt(claim, index) {
 function showVerification(result) {
   verifyResult = result;
   const claims = result.claims || [];
-  byId("verify-meta").textContent = [plural(claims.length, "claim"), result.target, modeNames[result.mode], result.as_of && "As of " + result.as_of].filter(Boolean).join(" · ");
+  byId("verify-meta").textContent = [plural(claims.length, "claim"), result.truncated && "Limited to four claims", result.target, modeNames[result.mode], result.as_of && "As of " + result.as_of].filter(Boolean).join(" · ");
   byId("receipts").replaceChildren(...claims.map(receipt));
   if (!claims.length) byId("receipts").append(element("p", "No claims were extracted. Enter a complete technical statement and try again.", "empty"));
   const tracePanel = byId("verify-trace");

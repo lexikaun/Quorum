@@ -1,24 +1,19 @@
-# Quorum pause checkpoint
+# Quorum progress
 
-Paused at the team's request on 18 November 2026. The team confirmed a 21 November submission deadline. The submission repository is private at https://github.com/lexikaun/Quorum. Its remote is named submission. The original ImTani remote and Git history are preserved. No public deployment or hackathon submission has been made.
+Submission deadline confirmed by the team as **21 November 2026**. Development is in the private [Quorum repository](https://github.com/lexikaun/Quorum). Push through the `submission` remote. The original ImTani `origin` and Git history are preserved.
 
-## Implemented and verified
+## Demo status
 
-- Tavily 01 checks Vite 6/7 runtime compatibility and build-target guidance per claim. It provides cited excerpts, reasons, corrections, supported/superseded/contradicted/unknown outcomes, version and optional date context. Replay works offline. Direct official-source mode was exercised against live Vite pages and tagged manifests. It marked Node 18 superseded and Node 22.12 supported for Vite 7. The Tavily Search/Extract transport was checked using fixtures. A real Tavily account call has not been verified.
-- Bifrost 02 compares research agents on 12 labeled tasks with configurable repetition, controlled evidence failures, traces, export, and optional HTTP and Bifrost adapters. A real Bifrost v2.4.0 gateway served CPU-local Qwen through llama.cpp. The saved report at lab/fixtures/local_bifrost_run.json includes 72 trials. Out of 24 trials per agent the first-result reader passed 14, version-aware verifier 24, and Qwen 13. The gateway reported 10,516 tokens. These scores describe the bundled suite only.
-- The browser UI has independent verifier and benchmark views, source inspection, date and version selection, recorded-run viewing, and JSON export. The device answer view can pass cited text to offline verification. The mounted API can save checks for the original claim IDs in local device storage. Original memory status and sync outbox are preserved. The standalone verifier, release switch, benchmark traces, and export were exercised in a browser before the final UI edits.
-- The pause checkpoint includes the latest UI edits, portable cache paths, the three-claim scripts/memory_lab.py launcher, and the unfinished general public-web tests. Models, binaries, Python environments, caches, and local device data remain ignored on disk. All development workers and identified demo servers were stopped.
+- **Tavily 01.** Vite 6/7 replay and direct live checks show supported, contradicted, superseded, and unknown claims with dated evidence. General Public web mode uses Bifrost to extract up to four atomic claims, Tavily Search and Extract for evidence, and Bifrost to adjudicate. Quorum checks quote text against retrieved passages and requires distinct dated sources before marking a claim superseded. The backend excludes sources dated after the requested cutoff and omits undated sources for historical checks. Publication dates alone cannot establish historical page contents.
+- **Bifrost 02.** The benchmark compares agents across 12 shared cases with repeats, evidence outages, traces and JSON export. The recorded 72-trial result includes 24 actual requests through Bifrost v2.4.0 to local Qwen. Out of 24 trials per agent the first-result reader passed 14, version-aware verifier 24, and Qwen 13. Bifrost reported 10,516 tokens. These scores describe the bundled suite only.
+- **Integration.** The device imports a cited answer into the lab, verifies it in local replay, and saves scope-specific receipts on the device. Device startup from the app directory can now import the lab. See [README.md](README.md) for setup and [DEMO_GUIDE.md](DEMO_GUIDE.md) for the two walkthroughs.
 
-## Verification at pause
+## Verified on 18 November 2026
 
-- From repository root, python -m unittest lab.test_benchmark lab.test_verifier lab.test_server -q passed all 21 tests.
-- Two focused device API tests passed for the lab mount and local review storage. JS syntax and Python compilation checks passed. The earlier full device regression run reported 158 passed and 2 optional Ollama tests skipped, before the final review-storage test was added.
-- Full lab discovery currently reports 25 tests and 5 errors, including subtest errors in lab/test_public_web.py. These capture the unfinished Public web feature. The Vite verifier and benchmark suites pass independently.
+- Full lab discovery passed all 25 tests. Full device suite passed 159 tests and skipped 2 optional Ollama tests.
+- Browser checks covered the mounted question, three citations, verification for both Vite releases, save and reload, a 24-trial fresh benchmark, recorded Bifrost results and JSON download.
+- Public web was exercised in a real browser against loopback Tavily and Bifrost fixtures. Official docs mode fetched live Vite sources and returned superseded for Node 18 and supported for Node 22.12 under Vite 7.
 
-## Exact next step when authorized to resume
+## Remaining verification
 
-From the repository root, run python -m unittest lab.test_public_web -v. Implement the missing Public web dispatch and arbitrary-claim Tavily/Bifrost pipeline against these loopback fixtures. The UI and server already expose the option, while lab/verifier.py still accepts only Vite 6 and Vite 7. Do not spend money on provider calls.
-
-Then verify the complete mounted browser journey using app/.venv/Scripts/python.exe scripts/memory_lab.py on port 8766. Ask about Vite, import the citations, verify for both releases, save, reload, and check that the correct receipts persist. The new launcher and most recent saved-review UI were not verified together before the pause. Resolve normal imports when launching from the app directory, where lab at repository root may not be on sys.path. Finish README setup and DEMO_GUIDE.md, then rerun lab discovery and the full device suite.
-
-The standalone lab can be started from the repository root with python -m lab.server (port 8765). For Git verification, compare git rev-parse HEAD with git ls-remote submission refs/heads/main. main still tracks upstream origin/main, so its upstream ahead count is expected.
+Real Tavily API calls require authorized credentials and can consume credits. No paid provider calls, public deployment or hackathon submission were made. For a real Tavily demonstration, follow the provider configuration in the demo guide when authorized to use an account key.

@@ -100,6 +100,32 @@ Everything starts device-only. Rules on the extracted claim decide when it's cle
 
 **Elimination round MVP:** the two-device demo runs end to end (`scripts/demo.ps1`, checked by `scripts/demo_check.py`); the landing page is in `site/`.
 
+## Freshness and research lab
+
+Launch from the repository root with Python 3.10+.
+
+```powershell
+python -m lab.server
+```
+
+Open [the lab](http://127.0.0.1:8765/) for the Tavily freshness verifier and Bifrost agent benchmark. Local replay and the recorded Bifrost run require no provider credentials. The [demo guide](DEMO_GUIDE.md) covers both flows and optional live provider setup.
+
+To run the lab inside the existing device app on Windows, create the environment with Python 3.12 and install device dependencies.
+
+```powershell
+py -3.12 -m venv app/.venv
+. ./scripts/env.ps1
+app/.venv/Scripts/python.exe -m pip install -r app/requirements.txt
+app/.venv/Scripts/python.exe scripts/memory_lab.py
+```
+
+Open [the demo device](http://127.0.0.1:8766/). The first start may download the embedding model. The demo launcher uses a separate persistent device directory with three cited examples.
+
+```powershell
+python -m unittest discover -s lab -q
+app/.venv/Scripts/python.exe -m pytest app/tests -q
+```
+
 ## Repository layout
 
 | Path | What it is |
