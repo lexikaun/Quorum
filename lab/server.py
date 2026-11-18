@@ -33,7 +33,10 @@ def dispatch(path, data):
         if mode == "live" and not status()["live_available"]:
             raise ValueError("Live search requires TAVILY_API_KEY on the server.")
         from .verifier import verify
-        return verify(text, target, mode)
+        as_of = data.get("as_of")
+        if as_of is not None and (not isinstance(as_of, str) or len(as_of) != 10):
+            raise ValueError("Use an ISO date such as 2025-06-24.")
+        return verify(text, target, mode, as_of=as_of)
     repeats = data.get("repeats", 2)
     if type(repeats) is not int or not 1 <= repeats <= 5:
         raise ValueError("Choose between one and five repetitions.")

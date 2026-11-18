@@ -10,7 +10,7 @@ Submission deadline confirmed by the team: 21 November 2026.
 Upstream commit `ee00633` implements Quorum's offline claim memory, citations, sync and owner resolution. The two challenge modules were absent. A single lab will serve both challenges either independently or inside the device UI. Team answers may enter offline replay locally. Live provider calls require explicit input and locally configured credentials.
 
 ## In progress
-Verifier, agent runner, interface and server integration. End-to-end verification pending.
+Verifier tested against 9 cases covering version changes, source dates, compound claims, live adapter failures and source provenance. The live transport tests use fixtures. Tests made zero paid calls. Benchmark, UI and integration verification are in progress.
 
 ## Git
 Original origin retained. Private submission remote is `lexikaun/Quorum`. Use `git log -1 --oneline` and `git ls-remote submission refs/heads/main` to compare the checkpoint.

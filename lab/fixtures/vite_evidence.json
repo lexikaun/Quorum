@@ -1,0 +1,47 @@
+{
+  "retrieved_at": "2026-11-18T02:02:02Z",
+  "sources": [
+    {
+      "target": "Vite 6",
+      "topic": "node",
+      "title": "Vite 6.0 release announcement · Node.js support",
+      "url": "https://vite.dev/blog/announcing-vite6#node-js-support",
+      "published_at": "2024-11-26",
+      "excerpt": "Vite 6 supports Node.js 18, 20, and 22+, similar to Vite 5.",
+      "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v6.0.0/packages/vite/package.json",
+      "engine": "^18.0.0 || ^20.0.0 || >=22.0.0",
+      "rule": "Vite 6 supports Node.js 18.x, 20.x, and 22.0.0 or later."
+    },
+    {
+      "target": "Vite 7",
+      "topic": "node",
+      "title": "Vite 7.0 release announcement · Node.js support",
+      "url": "https://vite.dev/blog/announcing-vite7#node-js-support",
+      "published_at": "2025-06-24",
+      "excerpt": "Vite now requires Node.js 20.19+, 22.12+.",
+      "engine_manifest": "https://raw.githubusercontent.com/vitejs/vite/v7.0.0/packages/vite/package.json",
+      "engine": "^20.19.0 || >=22.12.0",
+      "rule": "Vite 7 supports Node.js 20.x from 20.19.0, and Node.js 22.12.0 or later."
+    },
+    {
+      "target": "Vite 6",
+      "topic": "build",
+      "title": "Vite 6 build options · build.target",
+      "url": "https://v6.vite.dev/config/build-options#build-target",
+      "published_at": null,
+      "excerpt": "The default value is a Vite special value, 'modules'",
+      "default": "modules",
+      "rule": "The default build.target in Vite 6 is 'modules'."
+    },
+    {
+      "target": "Vite 7",
+      "topic": "build",
+      "title": "Vite 7 build options · build.target",
+      "url": "https://v7.vite.dev/config/build-options#build-target",
+      "published_at": null,
+      "excerpt": "The default value is a Vite special value, 'baseline-widely-available'",
+      "default": "baseline-widely-available",
+      "rule": "The default build.target in Vite 7 is 'baseline-widely-available'."
+    }
+  ]
+}
