@@ -25,7 +25,9 @@ Show the Vite 7 receipts in **Freshness verifier**. Open the Node.js 18 sources 
 
 ## Show both inside Quorum memory
 
-Install the device dependencies using the README, then run `app/.venv/Scripts/python.exe scripts/memory_lab.py` from the repository root. Open [the demo device](http://127.0.0.1:8766/) and ask **What do we know about Vite?** Click **Check claim freshness** beneath the cited answer. Verify it for Vite 7, click **Save checks to this device**, then switch to Vite 6 and repeat. Reload and open **Local citations** to see the persisted evidence for the selected release. Imported memory stays in local replay. Open **Agent benchmark** from the same lab to demonstrate the second track.
+Install the device dependencies using the README, then run `app/.venv/Scripts/python.exe scripts/memory_lab.py` from the repository root. Open [the demo device](http://127.0.0.1:8766/) and ask **What do we know about Vite?** Click **Check claim freshness** beneath the cited answer. Quorum checks the cited claims for Vite 7 and shows the verdicts in the app using saved documentation. Open **View 2 sources** on the Node.js 18 claim to show what changed. Select **Vite 6** and click **Check claims** to show that the same claim was supported in the earlier release.
+
+Click **Save checks to this device** to keep the results for the cited claim revisions. If you ask the same question again and check the same release and date, the panel confirms the checks are saved. Take the same steps from the [phone view](http://127.0.0.1:8766/phone) to demonstrate mobile. The [Agent benchmark](http://127.0.0.1:8766/lab/#benchmark) is available in Quorum Lab.
 
 ## Provider configuration
 

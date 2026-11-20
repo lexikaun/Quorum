@@ -1,6 +1,7 @@
 // The phone page (phone.html): one device's memory for a teammate's phone. State from GET /api/state, live
 // over SSE (/api/events), the same calls as the laptop pages (app/CONTRACT.md). Standalone on purpose: no
 // memory cloud, so nothing heavy loads on a phone.
+import { freshnessButton } from './freshness.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -122,6 +123,7 @@ async function ask(q) {
     box.className = `answer ${r.disputed ? 'disputed' : ''}`;
     const cites = (r.citations || []).slice(0, 4).map(c => `<li><b>${esc(kindLabel(c.kind))} · ${esc(prettyAuthor(c.author))}</b> · ${esc(when(c.at))}<br>${esc(c.excerpt)}</li>`).join('');
     box.innerHTML = `<div class="q">${esc(q)}</div><div class="txt">${esc(r.answer)}</div>${cites ? `<ul class="cites">${cites}</ul>` : ''}<div class="meta">${Math.round(r.took_ms ?? 0)} ms · with sources</div>`;
+    if (r.citations?.length) box.append(freshnessButton(api, q, r.citations));
   } catch (e) { box.innerHTML = `<div class="q">${esc(q)}</div><div class="txt">Couldn’t answer: ${esc(e.message)}</div>`; }
 }
 $('ask-form').addEventListener('submit', e => { e.preventDefault(); const q = $('ask').value; $('ask').blur(); ask(q); });

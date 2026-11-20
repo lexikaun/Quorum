@@ -419,13 +419,24 @@ def test_local_review_checks_original_claim_and_keeps_version_context(make_clien
     claim = make_claim("Vite", "runtime", "18", "Node.js 18 is supported.", tier="device")
     ctx.memory.add_claim(claim)
     ids = [claim["claim_id"]]
+    preview_path = "/api/freshness-reviews/preview"
+    saved_path = "/api/freshness-reviews/" + ids[0]
+    scope = {"claim_ids": ids, "claim_versions": {ids[0]: claim["version"]}, "target": "Vite 7"}
+    preview = client.post(preview_path, json=scope).json()["reviews"][0]
+    assert preview["claims"][0]["verdict"] == "superseded"
+    assert "saved_at" not in preview
+    assert client.get(saved_path).json()["reviews"] == []
     for target in ("Vite 6", "Vite 7", "Vite 7"):
         result = client.post("/api/freshness-reviews", json={"claim_ids": ids, "target": target})
         assert result.status_code == 200
-    saved = client.get("/api/freshness-reviews/" + ids[0]).json()["reviews"]
+    saved = client.get(saved_path).json()["reviews"]
     assert {r["target"]: r["claims"][0]["verdict"] for r in saved} == {
         "Vite 6": "supported", "Vite 7": "superseded"}
     assert len(saved) == 2 and ctx.store.outbox_ids() == set()
+    assert client.post(preview_path, json=scope).json()["reviews"][0]["saved_at"] == saved[0]["checked_at"]
+    historical = client.post(preview_path, json={**scope, "as_of": "2024-12-01"}).json()["reviews"][0]
+    assert historical["claims"][0]["verdict"] == "unknown"
+    assert "saved_at" not in historical
     assert ctx.memory.get(ids[0])["status"] == "active"
     assert client.post("/api/freshness-reviews", json={"claim_ids": ["missing"], "target": "Vite 7"}).status_code == 404
 
@@ -443,6 +454,6 @@ def test_freshness_reviews_follow_the_cited_claim_revision(make_client):
     receipt = client.get(path).json()
     assert receipt["current_version"] == updated["version"]
     assert receipt["reviews"][0]["version"] == claim["version"]
-    stale = client.post("/api/freshness-reviews", json={
-        "claim_ids": [cid], "claim_versions": {cid: claim["version"]}, "target": "Vite 7"})
-    assert stale.status_code == 409
+    scope = {"claim_ids": [cid], "claim_versions": {cid: claim["version"]}, "target": "Vite 7"}
+    for endpoint in ("/api/freshness-reviews", "/api/freshness-reviews/preview"):
+        assert client.post(endpoint, json=scope).status_code == 409

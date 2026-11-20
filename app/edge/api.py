@@ -152,8 +152,7 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
             raise HTTPException(404, "Unknown local claim.")
         return {"current_version": claim["version"], "reviews": ctx.store.kv_get("reviews:" + claim_id, [])}
 
-    @app.post("/api/freshness-reviews")
-    def save_reviews(body: ReviewBody):
+    def check_reviews(body: ReviewBody):
         from lab.verifier import verify
         receipts = []
         for cid in dict.fromkeys(body.claim_ids):
@@ -168,12 +167,29 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
                 raise HTTPException(400, str(exc)) from exc
             receipts.append({"claim_id": cid, "version": claim["version"], "target": body.target,
                              "as_of": body.as_of, "checked_at": check["timestamp"], "claims": check["claims"]})
+        return receipts
+
+    review_scope = ("version", "target", "as_of")
+
+    @app.post("/api/freshness-reviews/preview")
+    def preview_reviews(body: ReviewBody):
+        receipts = check_reviews(body)
+        for receipt in receipts:
+            saved = ctx.store.kv_get("reviews:" + receipt["claim_id"], [])
+            match = next((r for r in saved if all(r[field] == receipt[field] for field in review_scope)), None)
+            if match is not None and match["claims"] == receipt["claims"]:
+                receipt["saved_at"] = match["checked_at"]
+        return {"reviews": receipts}
+
+    @app.post("/api/freshness-reviews")
+    def save_reviews(body: ReviewBody):
+        receipts = check_reviews(body)
         # Per-device SQLite only. Keep up to 12 distinct release/date/version checks per claim.
         with review_lock:
             for receipt in receipts:
                 key = "reviews:" + receipt["claim_id"]
                 saved = [r for r in ctx.store.kv_get(key, []) if any(
-                    r[field] != receipt[field] for field in ("version", "target", "as_of"))]
+                    r[field] != receipt[field] for field in review_scope)]
                 ctx.store.kv_set(key, [receipt, *saved[:11]])
         return {"reviews": receipts}
 
