@@ -9,8 +9,23 @@ from urllib.parse import urlsplit
 from wsgiref.simple_server import make_server, WSGIServer
 
 WEB = Path(__file__).with_name("web")
-ASSETS = {"/": ("index.html","text/html"), "/index.html": ("index.html","text/html"),
-          "/style.css": ("style.css","text/css"), "/app.js": ("app.js","text/javascript")}
+DEVICE_WEB = WEB.parent.parent / "app" / "web"
+ASSETS = {
+    "/": (WEB / "index.html", "text/html"),
+    "/index.html": (WEB / "index.html", "text/html"),
+    "/style.css": (WEB / "style.css", "text/css"),
+    "/app.js": (WEB / "app.js", "text/javascript"),
+    "/benchmark/": (WEB / "benchmark/index.html", "text/html"),
+    "/benchmark/style.css": (WEB / "benchmark/style.css", "text/css"),
+    "/benchmark/app.js": (WEB / "benchmark/app.js", "text/javascript"),
+    "/benchmark/device/styles.css": (DEVICE_WEB / "styles.css", "text/css"),
+    "/benchmark/device/looks/studio.css": (DEVICE_WEB / "looks/studio.css", "text/css"),
+}
+for font in (
+    "schibsted-grotesk-400.woff2", "schibsted-grotesk-500.woff2", "schibsted-grotesk-600.woff2",
+    "schibsted-grotesk-700.woff2", "shantell-sans-700.woff2",
+):
+    ASSETS[f"/benchmark/device/looks/fonts/{font}"] = (DEVICE_WEB / "looks/fonts" / font, "font/woff2")
 MAX_BYTES = 64000
 
 
@@ -39,6 +54,9 @@ def dispatch(path, data):
         if as_of is not None and (not isinstance(as_of, str) or len(as_of) != 10):
             raise ValueError("Use an ISO date such as 2025-06-24.")
         return verify(text, target, mode, as_of=as_of)
+    if path == "/api/example":
+        from .benchmark import run_example
+        return run_example(data.get("condition"))
     repeats = data.get("repeats", 2)
     if type(repeats) is not int or not 1 <= repeats <= 5:
         raise ValueError("Choose between one and five repetitions.")
@@ -60,9 +78,9 @@ def application(env, start_response):
         if path == "/api/recorded-benchmark":
             return respond("200 OK", (WEB.parent / "fixtures/local_bifrost_run.json").read_bytes())
         if path in ASSETS:
-            filename, mime = ASSETS[path]
-            return respond("200 OK", (WEB / filename).read_bytes(), mime)
-    if path not in ("/api/verify", "/api/benchmark"):
+            asset, mime = ASSETS[path]
+            return respond("200 OK", asset.read_bytes(), mime)
+    if path not in ("/api/verify", "/api/benchmark", "/api/example"):
         return respond("404 Not Found", {"error":"Page not found."})
     if method != "POST":
         return respond("405 Method Not Allowed", {"error":"Use POST for this action."})

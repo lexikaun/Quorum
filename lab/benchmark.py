@@ -12,9 +12,10 @@ from urllib.request import Request, urlopen
 
 
 # The judge alone reads these labels.
+EXAMPLE_CASE = ("v7-node18", "Vite 7 supports Node.js 18.", "Vite 7", "older result first", "contradicted")
 CASES = (
     ("v6-node18", "Vite 6 supports Node.js 18.", "Vite 6", "normal", "supported"),
-    ("v7-node18", "Vite 7 supports Node.js 18.", "Vite 7", "older result first", "contradicted"),
+    EXAMPLE_CASE,
     ("v7-node22", "Vite 7 supports Node.js 22.12.0.", "Vite 7", "normal", "supported"),
     ("v7-before-floor", "Vite 7 supports Node.js 20.18.0.", "Vite 7", "older result first", "contradicted"),
     ("v6-node16", "Vite 6 supports Node.js 16.", "Vite 6", "normal", "contradicted"),
@@ -207,6 +208,15 @@ def _run(case, agent, repeat, agent_index):
         "steps": len(trial.trace), "toolCalls": sum(event["tool"] for event in trial.trace),
         "tokens": trial.tokens, "costUsd": trial.cost, "trace": trial.trace, "error": error,
     }
+
+
+def run_example(condition):
+    """Rerun one claim with the configured agents and a different evidence condition."""
+    if condition not in ("normal", "older result first", "source outage"):
+        raise ValueError("Choose a listed evidence condition.")
+    case_id, task, target, _, expected = EXAMPLE_CASE
+    case = (case_id, task, target, condition, "unknown" if condition == "source outage" else expected)
+    return {"runs": [_run(case, agent, 1, index) for index, agent in enumerate(_agents())]}
 
 
 def _total(rows, field):

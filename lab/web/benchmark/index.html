@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-look="studio">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Compare research agents on reproducible release-compatibility tasks.">
+  <meta name="theme-color" content="#eef0f3">
+  <title>Release Bench · Quorum</title>
+  <link rel="icon" href="data:,">
+  <script>
+    try {
+      if (localStorage.getItem("release-bench-theme") === "dark") {
+        delete document.documentElement.dataset.look;
+        document.querySelector('meta[name="theme-color"]').content = "#0a0e16";
+      }
+    } catch {
+      // The default Studio look also works without browser storage.
+    }
+  </script>
+  <link rel="stylesheet" href="device/styles.css">
+  <link rel="stylesheet" href="device/looks/studio.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" type="module"></script>
+</head>
+<body class="release-bench">
+  <a class="skip" href="#main">Skip to workspace</a>
+  <div class="device-app">
+    <header class="top">
+      <div class="brand">
+        <div class="mark" aria-hidden="true"><span>Q</span></div>
+        <div class="brand-text">
+          <h1 class="device-name"><b>Quorum</b><span> · Release Bench</span></h1>
+          <p class="device-sub"><span id="run-kind" class="live connecting">Loading</span><span class="node-kind">Research agent benchmark</span></p>
+        </div>
+      </div>
+      <div class="view-toggle theme-toggle" role="group" aria-label="Color theme">
+        <button type="button" data-theme="dark" aria-pressed="false">Dark</button>
+        <button class="on" type="button" data-theme="light" aria-pressed="true">Light</button>
+      </div>
+      <div class="stats" aria-label="Benchmark totals">
+        <div class="stat outbox"><span class="k">Cases</span><span id="total-cases" class="v">–</span></div>
+        <div class="stat outbox"><span class="k">Trials</span><span id="total-trials" class="v">–</span></div>
+      </div>
+      <button id="export" class="btn ghost" type="button" disabled>Download JSON</button>
+    </header>
+
+    <main id="main" class="grid" tabindex="-1">
+      <div class="cloud-wrap overview">
+        <div class="view-toggle" role="group" aria-label="Benchmark view">
+          <button id="view-example" class="on" type="button" aria-controls="example" aria-pressed="true">Example</button>
+          <button id="view-results" type="button" aria-controls="comparison" aria-pressed="false">Results</button>
+        </div>
+
+        <section id="example" class="example" aria-labelledby="example-title">
+          <div class="cloud-head">
+            <p class="cloud-title">Start with an example</p>
+            <h2 id="example-title">Does Vite 7 work with Node.js 18?</h2>
+            <p class="example-intro">Vite needs a compatible Node.js version to run. Change which pinned release guides the assistants see, then compare their answers.</p>
+          </div>
+          <div class="example-replay">
+            <div class="view-toggle evidence-toggle" role="group" aria-label="Replay with different evidence">
+              <button type="button" data-condition="normal" aria-pressed="false">Right guide first</button>
+              <button class="on" type="button" data-condition="older result first" aria-pressed="true">Old guide first</button>
+              <button type="button" data-condition="source outage" aria-pressed="false">No guides</button>
+            </div>
+            <p id="example-status" class="metadata example-status" role="status">Loading the recorded example…</p>
+          </div>
+          <div id="example-results" class="example-results" aria-busy="false"></div>
+          <button id="inspect-example" class="btn primary" type="button" disabled>See how they answered</button>
+        </section>
+
+        <section id="comparison" aria-labelledby="comparison-title" hidden>
+          <div class="cloud-head">
+            <h2 id="comparison-title" class="cloud-title">How each assistant scored</h2>
+            <p id="report-meta" class="cloud-subtitle"></p>
+          </div>
+          <div id="agents" class="agent-grid"></div>
+          <details id="methodology" class="methodology">
+            <summary>Benchmark methodology</summary>
+            <dl id="protocol"></dl>
+          </details>
+        </section>
+      </div>
+
+      <section id="inspector" class="panel assistant inspector" aria-labelledby="inspector-title" tabindex="-1">
+        <div class="panel-head"><h2 id="inspector-title">Case inspection</h2><span id="case-condition" class="panel-note"></span></div>
+        <div class="inspector-head">
+          <div>
+            <h3 id="case-title">Select a case</h3>
+            <p id="case-expected" class="metadata"></p>
+          </div>
+          <label id="repeat-picker" class="filter" for="trial" hidden>Trial
+            <select id="trial" aria-label="Trial to inspect"></select>
+          </label>
+        </div>
+        <div id="trace-output" class="answer">
+          <div id="traces" class="trace-grid"></div>
+        </div>
+      </section>
+
+      <div class="side">
+        <section class="panel capture setup" aria-labelledby="setup-title">
+          <div class="panel-head"><h2 id="setup-title">Benchmark setup</h2><span id="model-status" class="panel-note">Vite 6 and 7</span></div>
+          <form id="run-form">
+            <div class="repeat-field">
+              <label for="repeats" class="sr-only">Repeats per case</label>
+              <select id="repeats" name="repeats">
+                <option value="1">1 repeat per case</option>
+                <option value="2" selected>2 repeats per case</option>
+                <option value="3">3 repeats per case</option>
+                <option value="4">4 repeats per case</option>
+                <option value="5">5 repeats per case</option>
+              </select>
+            </div>
+            <button id="run" class="btn primary" type="submit">Run benchmark</button>
+          </form>
+          <div class="suggestions">
+            <button id="recorded" type="button">Load recorded Bifrost run</button>
+          </div>
+          <p id="status" class="feedback" role="status">Loading recorded run…</p>
+        </section>
+
+        <section id="cases" class="panel activity case-list" aria-labelledby="cases-title">
+          <div class="panel-head"><h2 id="cases-title">Case explorer</h2><span id="case-count" class="panel-note"></span></div>
+          <label class="sr-only" for="condition">Condition</label>
+          <select id="condition" disabled>
+            <option value="all">All conditions</option>
+            <option value="older result first">Older result first</option>
+            <option value="older source timeout">Older source timeout</option>
+            <option value="source outage">Source outage</option>
+            <option value="normal">Normal</option>
+          </select>
+          <div id="case-list" class="inbox"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

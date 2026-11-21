@@ -65,6 +65,27 @@ class BenchmarkTests(unittest.TestCase):
         self.assertLess(agents[0]["passed"], agents[1]["passed"])
         self.assertEqual(agents[1]["successRate"], 1)
 
+    def test_example_dispatches_live_bifrost_and_retains_the_completion_trace(self):
+        received = []
+
+        def respond(request):
+            received.append(request)
+            return 200, {"id": "live-example", "model": "test-model", "usage": {"total_tokens": 49},
+                         "choices": [{"message": {"content": '{"answer":"supported"}'}}]}
+
+        with local_endpoint(respond) as endpoint, patch.dict(os.environ, {
+            "LAB_BIFROST_URL": endpoint, "LAB_BIFROST_MODEL": "openai/test-model",
+        }):
+            runs = benchmark.run_example("older result first")["runs"]
+
+        self.assertEqual(len(received), 1)
+        packet = json.loads(received[0]["messages"][1]["content"])
+        self.assertEqual([source["target"] for source in packet["sources"]], ["Vite 6", "Vite 7"])
+        self.assertEqual(len(runs), 3)
+        self.assertEqual(runs[-1]["tokens"], 49)
+        self.assertFalse(runs[-1]["success"])
+        self.assertEqual(runs[-1]["trace"][2]["requestId"], "live-example")
+
     def test_http_agent_receives_blind_tasks_and_keeps_unknown_usage(self):
         received = []
 

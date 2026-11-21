@@ -9,6 +9,7 @@ import socket
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 import zipfile
 from contextlib import ExitStack
@@ -42,8 +43,16 @@ def prepare():
         path.parent.mkdir(parents=True, exist_ok=True)
         part = path.with_suffix(".download")
         print(f"Downloading {path.name}", flush=True)
-        with urllib.request.urlopen(url, timeout=120) as src, part.open("wb") as dest:
-            shutil.copyfileobj(src, dest)
+        try:
+            with urllib.request.urlopen(url, timeout=120) as src, part.open("wb") as dest:
+                shutil.copyfileobj(src, dest)
+        except urllib.error.HTTPError as exc:
+            curl = shutil.which("curl.exe")
+            if exc.code != 403 or curl is None:
+                raise
+            subprocess.run([curl, "--fail", "--location", "--silent", "--show-error", "--retry", "2",
+                            "--connect-timeout", "30", "--max-time", "1200", "--output", str(part), url],
+                           check=True, creationflags=subprocess.CREATE_NO_WINDOW)
         if digest(part) != checksum:
             raise RuntimeError(f"Checksum mismatch for {path.name}")
         part.replace(path)
