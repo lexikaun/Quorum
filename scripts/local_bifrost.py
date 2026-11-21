@@ -100,7 +100,11 @@ def main():
     prepare()
     if args.prepare:
         return
-    for port in (18761, 18762, args.port):
+    node = shutil.which("node") if not os.getenv("LAB_AGENT_URL") else None
+    ports = (18761, 18762, args.port, 18763) if node else (18761, 18762, args.port)
+    if len(set(ports)) != len(ports):
+        parser.error("Choose a lab port distinct from the local gateway, model, and agent ports.")
+    for port in ports:
         with socket.socket() as check:
             check.bind(("127.0.0.1", port))
     config = CACHE / "bifrost/local"
@@ -125,7 +129,13 @@ def main():
         start(stack, [str(GATEWAY), "-app-dir", str(config), "-host","127.0.0.1","-port","18762"],
               "local-gateway", env, "http://127.0.0.1:18762/health")
         os.environ.update(LAB_BIFROST_URL="http://127.0.0.1:18762/v1/chat/completions",
-                          LAB_BIFROST_MODEL="openai/quorum-qwen", LAB_AGENT_TIMEOUT_SECONDS="90")
+                          LAB_BIFROST_MODEL="openai/quorum-qwen", LAB_BIFROST_JSON_SCHEMA="1",
+                          LAB_AGENT_TIMEOUT_SECONDS="90")
+        if node:
+            start(stack, [node, str(ROOT / "scripts/research_agent.mjs"), "18763"], "research-agent", env,
+                  "http://127.0.0.1:18763/health")
+            os.environ["LAB_AGENT_URL"] = "http://127.0.0.1:18763/research"
+            os.environ.pop("LAB_AGENT_TOKEN", None)
         sys.path.insert(0, str(ROOT))
         from lab.server import main as serve
         sys.argv = [sys.argv[0], "--port", str(args.port)]

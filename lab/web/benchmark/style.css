@@ -47,6 +47,17 @@
 .example-source a { font-size: 13px; }
 .example-source blockquote { margin: 3px 0 0; color: var(--sub); font-size: 13px; line-height: 1.35; }
 .example-card .model-usage { margin-top: auto; color: var(--sub); font-size: 13px; }
+.example-card:has(.model-usage) .example-source { margin-top: 2px; }
+.example-results[aria-busy="true"] > .example-card { opacity: .58; animation: none; }
+.failure-breakdown { overflow-x: auto; margin-top: 10px; }
+.failure-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; }
+.failure-table caption { padding-bottom: 5px; text-align: left; font-weight: 650; }
+.failure-table :is(th, td) { padding: 5px 8px; border-bottom: 1px solid var(--line); }
+.failure-table :is(th, td):first-child { text-align: left; }
+.failure-table thead th { color: var(--sub); font-weight: 600; }
+.failure-table tbody td { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.failure-value { color: var(--failure-ink); font-weight: 650; }
+.failure-table tbody tr:hover { background: var(--card-2); }
 .agent-card { min-width: 0; padding: 9px 10px; }
 .score-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 8px; margin-top: 4px; }
 .pass-rate { font: 700 20px/1.4 var(--mono); }

@@ -65,33 +65,43 @@ class BenchmarkTests(unittest.TestCase):
         self.assertLess(agents[0]["passed"], agents[1]["passed"])
         self.assertEqual(agents[1]["successRate"], 1)
 
-    def test_example_dispatches_live_bifrost_and_retains_the_completion_trace(self):
+    def test_example_compares_bifrost_workflows_with_matching_model_settings(self):
         received = []
 
         def respond(request):
             received.append(request)
-            return 200, {"id": "live-example", "model": "test-model", "usage": {"total_tokens": 49},
+            return 200, {"id": f"live-example-{len(received)}", "model": "test-model", "usage": {"total_tokens": 49},
                          "choices": [{"message": {"content": '{"answer":"supported"}'}}]}
 
         with local_endpoint(respond) as endpoint, patch.dict(os.environ, {
-            "LAB_BIFROST_URL": endpoint, "LAB_BIFROST_MODEL": "openai/test-model",
+            "LAB_BIFROST_URL": endpoint, "LAB_BIFROST_MODEL": "openai/test-model", "LAB_BIFROST_JSON_SCHEMA": "1",
         }):
             runs = benchmark.run_example("older result first")["runs"]
 
-        self.assertEqual(len(received), 1)
-        packet = json.loads(received[0]["messages"][1]["content"])
-        self.assertEqual([source["target"] for source in packet["sources"]], ["Vite 6", "Vite 7"])
-        self.assertEqual(len(runs), 3)
-        self.assertEqual(runs[-1]["tokens"], 49)
-        self.assertFalse(runs[-1]["success"])
-        self.assertEqual(runs[-1]["trace"][2]["requestId"], "live-example")
+        self.assertEqual(len(received), 2)
+        self.assertEqual(len(runs), 2)
+        packets = [json.loads(request["messages"][1]["content"]) for request in received]
+        self.assertEqual([run["trace"][1]["evidence"][0]["target"] for run in runs], ["Vite 6", "Vite 7"])
+        self.assertEqual([packet.pop("evidence").split()[1] for packet in packets], ["6", "7"])
+        self.assertEqual([packet.pop("compatibility_check") for packet in packets], ["compatible", "incompatible"])
+        self.assertEqual(*packets)
+        self.assertEqual(*[{**request, "messages": request["messages"][:1]} for request in received])
+        enum = received[0]["response_format"]["json_schema"]["schema"]["properties"]["answer"]["enum"]
+        self.assertEqual(enum, ["supported", "contradicted", "unknown"])
+        self.assertEqual(runs[0]["trace"][0]["sources"], runs[1]["trace"][0]["sources"])
+        for index, run in enumerate(runs, 1):
+            self.assertEqual(run["tokens"], 49)
+            self.assertFalse(run["success"])
+            completion = next(step for step in run["trace"] if step["action"] == "Receive completion")
+            self.assertEqual(completion["requestId"], f"live-example-{index}")
 
     def test_http_agent_receives_blind_tasks_and_keeps_unknown_usage(self):
         received = []
 
         def respond(request):
             received.append(request)
-            return 200, {"answer": "unknown"}
+            return 200, {"answer": "unknown", "citations": ["https://outside.test/unknown"] +
+                         [source["url"] for source in request["sources"][:1]]}
 
         with local_endpoint(respond) as endpoint, patch.dict(os.environ, {"LAB_AGENT_URL": endpoint}):
             report = benchmark.run_benchmark(1)
@@ -104,6 +114,10 @@ class BenchmarkTests(unittest.TestCase):
         self.assertIsNone(external["costUsd"])
         self.assertIsNone(external["consistencyRate"])
         self.assertGreater(external["passed"], 0)
+        runs = [run for run in report["runs"] if run["agent"] == external["agent"]]
+        citations = [source["url"] for run in runs for event in run["trace"] for source in event.get("evidence", [])]
+        self.assertTrue(citations)
+        self.assertNotIn("https://outside.test/unknown", citations)
 
     def test_verifier_cannot_read_the_timed_out_release(self):
         report = benchmark.run_benchmark(1)
@@ -115,7 +129,7 @@ class BenchmarkTests(unittest.TestCase):
     def test_bifrost_chat_accounts_actual_usage_and_keeps_failed_requests(self):
         def respond(request):
             prompt = json.loads(request["messages"][-1]["content"])
-            if not prompt["sources"]:
+            if not prompt["evidence"]:
                 return 503, {"error":"unavailable"}
             if request.get("max_tokens") != 96 or request.get("temperature") != 0:
                 return 400, {"error": "missing generation limits"}
@@ -135,6 +149,19 @@ class BenchmarkTests(unittest.TestCase):
         failed = [r for r in runs if r["error"]]
         self.assertTrue(failed and all(not r["success"] for r in failed))
         self.assertIsNone(agent["costUsd"])
+        self.assertEqual(agent["failureModes"]["outage"], {"trials": 1, "guessed": 0, "errors": 1})
+
+    def test_failure_modes_count_outage_guesses_separately_from_errors(self):
+        runs = [
+            {"condition": "source outage", "answer": "supported", "success": False, "error": None},
+            {"condition": "source outage", "answer": None, "success": False, "error": "timeout"},
+            {"condition": "source outage", "answer": "unknown", "success": True, "error": None},
+            {"condition": "older result first", "answer": "supported", "success": False, "error": None},
+        ]
+        self.assertEqual(benchmark._failure_modes(runs), {
+            "olderFirst": {"trials": 1, "wrong": 1, "errors": 0},
+            "outage": {"trials": 3, "guessed": 1, "errors": 1},
+        })
 
     def test_repeat_bounds(self):
         for invalid in (0, True, 11, 1.5):

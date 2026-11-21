@@ -34,6 +34,25 @@ INSTRUCTIONS = (
     'Return only one JSON object, e.g. {"answer":"supported"}. Allowed answers '
     "are supported, contradicted, unknown."
 )
+BIFROST_POLICIES = (
+    ("Bifrost · First guide", "first_guide"),
+    ("Bifrost · Match release", "match_release"),
+)
+BIFROST_INSTRUCTIONS = (
+    "Report the decision from the compatibility check. A check that returned compatible maps to supported, "
+    "incompatible maps to contradicted, and inconclusive maps to unknown. If there is no compatibility check, "
+    "use the guide text if it establishes the answer. With no evidence return unknown. "
+    "Output only JSON with an answer field."
+)
+BIFROST_VERDICT_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "release_verdict",
+        "strict": True,
+        "schema": {"type": "object", "required": ["answer"], "additionalProperties": False,
+                   "properties": {"answer": {"type": "string", "enum": ["supported", "contradicted", "unknown"]}}},
+    },
+}
 
 
 class Trial:
@@ -142,34 +161,78 @@ def _post(url, key, payload):
         raise ValueError("Adapter connection failed or timed out") from None
 
 
-def _remote_agent(url, key, model=None):
+def _remote_agent(url, key):
     def run(trial):
-        packet = {"task": trial.task, "target": trial.target, "sources": trial.search(),
-                  "instructions": INSTRUCTIONS}
-        trial.record("Call Bifrost" if model else "Call external agent",
-                     model or "JSON over HTTP", tool=True)
-        if model:
-            request = {"model": model, "temperature": 0, "max_tokens": 96, "messages": [
-                {"role": "system", "content": INSTRUCTIONS},
-                {"role": "user", "content": json.dumps(packet)},
-            ]}
-            response = _post(url, key, request)
-            trial.record("Receive completion", str(response.get("model") or model),
-                         requestId=response.get("id"))
-            usage = response.get("usage") or {}
-            trial.tokens = _quantity(usage.get("total_tokens"), integer=True)
-            cost = usage.get("cost")
-            trial.cost = _quantity(cost.get("total_cost") if isinstance(cost, dict) else cost)
-            content = response["choices"][0]["message"]["content"].strip()
-            fence = re.fullmatch(r"```(?:json)?\s*\n(.*?)\n```", content, flags=re.I | re.S)
-            answer = json.loads(fence[1] if fence else content)
-        else:
-            answer = _post(url, key, packet)
-            trial.tokens = _quantity(answer.get("tokens"), integer=True)
-            trial.cost = _quantity(answer.get("costUsd"))
+        sources = trial.search()
+        packet = {"task": trial.task, "target": trial.target, "sources": sources, "instructions": INSTRUCTIONS}
+        trial.record("Call external agent", "JSON over HTTP", tool=True)
+        answer = _post(url, key, packet)
+        trial.tokens = _quantity(answer.get("tokens"), integer=True)
+        trial.cost = _quantity(answer.get("costUsd"))
+        cited = answer.get("citations")
+        if isinstance(cited, list):
+            evidence = [source for source in sources if source["url"] in cited]
+            trial.record("Read agent citations", f"{len(evidence)} citations match supplied guides", evidence=evidence)
         return answer["answer"]
 
     return run
+
+
+def _manifest_finding(trial, guide):
+    runtime = re.search(r"\bNode\.js (\d+(?:\.\d+){0,2})\b", trial.task)
+    if not guide or not runtime or "engine" not in guide or "dropped support" in trial.task:
+        return "not assessed"
+    from .verifier import runtime_support
+
+    support = runtime_support(runtime[1], guide["engine"])
+    finding = {True: "compatible", False: "incompatible", None: "inconclusive"}[support]
+    trial.record("Check Node.js against the selected manifest",
+                 f"Node.js {runtime[1]} is {finding} under {guide['engine']}", tool=True, url=guide["engine_manifest"])
+    return finding
+
+
+def _bifrost_agent(url, key, model, policy, structured):
+    def run(trial):
+        sources = trial.search()
+        if policy == "first_guide":
+            selected = sources[:1]
+            action = "Take first guide"
+        else:
+            selected = [source for source in sources if source["target"] == trial.target][:1]
+            action = "Match requested release"
+        trial.record(action, selected[0]["title"] if selected else "No guide selected", tool=True,
+                     policy=policy, evidence=selected)
+        guide = selected[0] if selected else None
+        packet = {"claim": trial.task, "target": trial.target, "evidence": guide["rule"] if guide else None,
+                  "compatibility_check": _manifest_finding(trial, guide)}
+        request = {"model": model, "temperature": 0, "max_tokens": 96, "messages": [
+            {"role": "system", "content": BIFROST_INSTRUCTIONS},
+            {"role": "user", "content": json.dumps(packet)},
+        ]}
+        if structured:
+            request["response_format"] = BIFROST_VERDICT_FORMAT
+        trial.record("Call Bifrost", model, tool=True, maxTokens=96, temperature=0)
+        response = _post(url, key, request)
+        trial.record("Receive completion", str(response.get("model") or model), requestId=response.get("id"))
+        usage = response.get("usage") or {}
+        trial.tokens = _quantity(usage.get("total_tokens"), integer=True)
+        cost = usage.get("cost")
+        trial.cost = _quantity(cost.get("total_cost") if isinstance(cost, dict) else cost)
+        content = response["choices"][0]["message"]["content"].strip()
+        fence = re.fullmatch(r"```(?:json)?\s*\n(.*?)\n```", content, flags=re.I | re.S)
+        return json.loads(fence[1] if fence else content)["answer"]
+
+    return run
+
+
+def _bifrost_agents():
+    url, model = os.environ.get("LAB_BIFROST_URL"), os.environ.get("LAB_BIFROST_MODEL")
+    if not url or not model:
+        return []
+    key = os.environ.get("LAB_BIFROST_KEY")
+    structured = os.environ.get("LAB_BIFROST_JSON_SCHEMA") == "1"
+    return [(name, _bifrost_agent(url, key, model, policy, structured), True)
+            for name, policy in BIFROST_POLICIES]
 
 
 def _agents():
@@ -177,10 +240,7 @@ def _agents():
     url = os.environ.get("LAB_AGENT_URL")
     if url:
         agents.append(("HTTP research agent", _remote_agent(url, os.environ.get("LAB_AGENT_TOKEN")), True))
-    url, model = os.environ.get("LAB_BIFROST_URL"), os.environ.get("LAB_BIFROST_MODEL")
-    if url and model:
-        agents.append(("Bifrost · " + model, _remote_agent(url, os.environ.get("LAB_BIFROST_KEY"), model), True))
-    return agents
+    return agents + _bifrost_agents()
 
 
 def _run(case, agent, repeat, agent_index):
@@ -216,12 +276,31 @@ def run_example(condition):
         raise ValueError("Choose a listed evidence condition.")
     case_id, task, target, _, expected = EXAMPLE_CASE
     case = (case_id, task, target, condition, "unknown" if condition == "source outage" else expected)
-    return {"runs": [_run(case, agent, 1, index) for index, agent in enumerate(_agents())]}
+    agents = _bifrost_agents() or _agents()
+    return {"runs": [_run(case, agent, 1, index) for index, agent in enumerate(agents)]}
 
 
 def _total(rows, field):
     values = [row[field] for row in rows]
     return sum(values) if None not in values else None
+
+
+def _failure_modes(rows):
+    older_first = [run for run in rows if run["condition"] == "older result first"]
+    outage = [run for run in rows if run["condition"] == "source outage"]
+    return {
+        "olderFirst": {"trials": len(older_first), "wrong": sum(not run["success"] and not run["error"] for run in older_first),
+                       "errors": sum(bool(run["error"]) for run in older_first)},
+        "outage": {"trials": len(outage), "guessed": sum(run["answer"] in ("supported", "contradicted") for run in outage),
+                   "errors": sum(bool(run["error"]) for run in outage)},
+    }
+
+
+def recorded_benchmark():
+    report = json.loads(CORPUS.with_name("local_bifrost_run.json").read_text(encoding="utf-8"))
+    for agent in report["summary"]:
+        agent["failureModes"] = _failure_modes([run for run in report["runs"] if run["agent"] == agent["agent"]])
+    return report
 
 
 def _summary(name, rows, repeats):
@@ -234,7 +313,8 @@ def _summary(name, rows, repeats):
     return {"agent": name, "runs": len(rows), "passed": passed, "successRate": passed / len(rows),
             "avgLatencyMs": mean(r["latencyMs"] for r in rows), "avgSteps": mean(r["steps"] for r in rows),
             "avgToolCalls": mean(r["toolCalls"] for r in rows), "tokens": _total(rows, "tokens"),
-            "costUsd": _total(rows, "costUsd"), "consistencyRate": consistent / len(case_ids) if repeats > 1 else None}
+            "costUsd": _total(rows, "costUsd"), "consistencyRate": consistent / len(case_ids) if repeats > 1 else None,
+            "failureModes": _failure_modes(rows)}
 
 
 def run_benchmark(repeats=2):
@@ -252,6 +332,7 @@ def run_benchmark(repeats=2):
         "protocol": {
             "workload": "Twelve closed-corpus Vite runtime, migration and build claims. Conditions include reordered results, a simulated single-source timeout, and a full source outage.",
             "scoring": "Exact target-release verdict. Superseded counts as contradicted. Source outage requires abstention.",
+            "headToHead": "Both Bifrost workflows use the same model, prompt, manifest check and 96-token output cap. They choose which guide to send from the same search results.",
             "consistency": "Fraction of tasks with the same verdict and no errors across all repetitions.",
             "metrics": "Steps are trace events. Tool calls count harness-observed searches, manifest reads and adapter calls. Internal adapter operations are outside this count. Latency is observed wall time. Unknown provider tokens and USD remain null.",
         },

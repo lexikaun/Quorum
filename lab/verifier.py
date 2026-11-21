@@ -91,6 +91,22 @@ def _tuple(version):
     return parts + (0,) * (3 - len(parts))
 
 
+def runtime_support(version, engine):
+    """Return whether the supplied engine range covers the requested Node.js version."""
+    # A bare major covers the whole major; Node 20 alone is ambiguous for Vite 7.
+    low = _tuple(version)
+    precision = len(version.split("."))
+    high = low[:precision] + (float("inf"),) * (3 - precision)
+    for clause in engine.split(" || "):
+        bound = _tuple(clause.lstrip("^>="))
+        end = (bound[0] + 1, 0, 0) if clause.startswith("^") else (float("inf"),)
+        if bound <= low and high < end:
+            return True
+        if low < end and high >= bound:
+            return None
+    return False
+
+
 def _assess(parsed, source):
     _, kind, value, negated = parsed
     if kind == "default":
@@ -99,18 +115,8 @@ def _assess(parsed, source):
         return source["engine"] == value
     if kind == "minimum":
         return _tuple(value) == min(_tuple(c.lstrip("^>=")) for c in source["engine"].split(" || "))
-    # A bare major covers the whole major; Node 20 alone is ambiguous for Vite 7.
-    low = _tuple(value)
-    precision = len(value.split("."))
-    high = low[:precision] + (float("inf"),) * (3 - precision)
-    for clause in source["engine"].split(" || "):
-        bound = _tuple(clause.lstrip("^>="))
-        end = (bound[0] + 1, 0, 0) if clause.startswith("^") else (float("inf"),)
-        if bound <= low and high < end:
-            return not negated
-        if low < end and high >= bound:
-            return None
-    return negated
+    supported = runtime_support(value, source["engine"])
+    return None if supported is None else supported != negated
 
 
 TAVILY_ENDPOINT = "https://api.tavily.com"

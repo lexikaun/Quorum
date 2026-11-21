@@ -34,6 +34,7 @@ let selectedCase = exampleCase;
 let exampleRuns = [];
 let inspectionRuns = [];
 let inspectionHasRepeats = false;
+let bifrostConfigured = false;
 
 function showTheme(theme) {
   const light = theme === "light";
@@ -105,6 +106,40 @@ function agentCard(agent) {
   return card;
 }
 
+function failureValue(group, metric) {
+  if (!group?.trials) return "—";
+  const count = `${group[metric]}/${group.trials}`;
+  return group.errors ? `${count} · ${group.errors} ${group.errors === 1 ? "error" : "errors"}` : count;
+}
+
+function showFailureBreakdown(agents) {
+  const table = element("table", "failure-table");
+  const caption = table.createCaption();
+  caption.textContent = "Failures by evidence condition";
+  const header = table.createTHead().insertRow();
+  for (const label of ["Workflow", "Passed", "Wrong with old guide first", "Guessed with no guides"]) {
+    const column = element("th", null, label);
+    column.scope = "col";
+    header.append(column);
+  }
+  const body = table.createTBody();
+  for (const agent of agents) {
+    const row = body.insertRow();
+    const name = element("th", null, agent.agent);
+    name.scope = "row";
+    row.append(name);
+    row.insertCell().textContent = `${agent.passed}/${agent.runs}`;
+    const modes = agent.failureModes;
+    for (const [group, metric] of [[modes?.olderFirst, "wrong"], [modes?.outage, "guessed"]]) {
+      const cell = row.insertCell();
+      cell.textContent = failureValue(group, metric);
+      if (group?.[metric] || group?.errors) cell.classList.add("failure-value");
+    }
+  }
+  const container = byId("failure-breakdown");
+  container.replaceChildren(table);
+}
+
 function sourceLink(url, label) {
   const parsed = URL.parse(url);
   if (parsed?.protocol !== "https:" && parsed?.protocol !== "http:") return null;
@@ -117,11 +152,17 @@ function sourceLink(url, label) {
 
 function exampleCard(run, evidence) {
   const orderedSources = run.trace.find((step) => step.sources)?.sources || [];
+  const selection = run.trace.find((step) => step.policy);
   const readsFirst = run.agent === firstResultAgent;
   const baseline = exampleAgents.includes(run.agent);
-  const source = baseline ? evidence.find((entry) => readsFirst ? entry.url === orderedSources[0] : entry.target === run.target) : undefined;
+  const source = selection?.evidence?.[0] ?? (baseline
+    ? evidence.find((entry) => readsFirst ? entry.url === orderedSources[0] : entry.target === run.target)
+    : undefined);
   let explanation = "No guides were available, so it left the question unanswered.";
   if (run.error) explanation = "The assistant hit an error. Open the trace for details.";
+  else if (selection) explanation = source
+    ? `The workflow sent the ${source.target} guide to the model.`
+    : "The workflow sent the claim with an empty evidence list.";
   else if (!baseline) explanation = orderedSources.length
     ? `It received ${orderedSources.length} guides in the same search order.`
     : "It answered without any guides.";
@@ -147,7 +188,9 @@ function exampleCard(run, evidence) {
   }
   if (!baseline && !run.error) {
     const usage = run.tokens == null ? "Token usage unreported" : `${number.format(run.tokens)} tokens`;
-    card.append(element("p", "example-source model-usage", `Live response · ${latency(run.latencyMs)} · ${usage}`));
+    const completion = run.trace.find((step) => step.requestId);
+    const label = completion ? "Live Bifrost" : "Live HTTP agent";
+    card.append(element("p", "model-usage", `${label} · ${latency(run.latencyMs)} · ${usage}`));
   }
   return card;
 }
@@ -172,7 +215,7 @@ async function replayExample(condition) {
   if (exampleOutput.getAttribute("aria-busy") === "true") return;
   exampleOutput.setAttribute("aria-busy", "true");
   exampleStatus.classList.remove("error");
-  exampleStatus.textContent = "Running the assistants…";
+  exampleStatus.textContent = bifrostConfigured ? "Running both workflows through Bifrost…" : "Running the assistants…";
   for (const button of evidenceButtons) button.setAttribute("aria-disabled", "true");
   try {
     const response = await fetch("../api/example", {
@@ -182,7 +225,8 @@ async function replayExample(condition) {
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Unable to run the example.");
-    showExample(result.runs, `${result.runs.length} trials complete`);
+    const paired = result.runs.every((run) => run.trace.some((step) => step.policy));
+    showExample(result.runs, paired ? "Live head-to-head" : `${result.runs.length} trials complete`);
     showExampleInspection();
   } catch (error) {
     exampleStatus.textContent = error.message;
@@ -289,7 +333,9 @@ function showReport(result, isRecorded) {
   byId("total-cases").textContent = result.caseCount;
   byId("total-trials").textContent = result.runs.length;
   byId("report-meta").textContent = `${source} · ${result.caseCount} cases · ${result.runs.length} trials`;
-  byId("agents").replaceChildren(...result.summary.map(agentCard));
+  const agents = result.summary.slice().sort((a, b) => Number(b.agent.startsWith("Bifrost ·")) - Number(a.agent.startsWith("Bifrost ·")));
+  showFailureBreakdown(agents);
+  byId("agents").replaceChildren(...agents.map(agentCard));
   const previousTrial = Number(trialSelect.value) || 1;
   trialSelect.replaceChildren(...Array.from({ length: result.repeats }, (_, index) => {
     const option = element("option", null, `Repeat ${index + 1}`);
@@ -385,7 +431,11 @@ showTheme(document.documentElement.dataset.look === "studio" ? "light" : "dark")
 fetch("../api/status")
   .then((response) => response.ok ? response.json() : null)
   .then((config) => {
-    if (config?.bifrost_available) byId("model-status").textContent = "Bifrost configured";
+    bifrostConfigured = Boolean(config?.bifrost_available);
+    if (bifrostConfigured) {
+      byId("model-status").textContent = config.external_agent_available ? "Bifrost + HTTP agent" : "Bifrost configured";
+      byId("example-intro").textContent = "Same model, prompt, and token limit. One workflow takes the first guide. The other checks which release it covers.";
+    }
     else if (config?.external_agent_available) byId("model-status").textContent = "External agent configured";
   })
   .catch(() => {});

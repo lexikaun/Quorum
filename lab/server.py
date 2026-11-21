@@ -76,7 +76,8 @@ def application(env, start_response):
         if path == "/api/status":
             return respond("200 OK", status())
         if path == "/api/recorded-benchmark":
-            return respond("200 OK", (WEB.parent / "fixtures/local_bifrost_run.json").read_bytes())
+            from .benchmark import recorded_benchmark
+            return respond("200 OK", recorded_benchmark())
         if path in ASSETS:
             asset, mime = ASSETS[path]
             return respond("200 OK", asset.read_bytes(), mime)
