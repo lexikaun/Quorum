@@ -1,7 +1,7 @@
 // The phone page (phone.html): one device's memory for a teammate's phone. State from GET /api/state, live
 // over SSE (/api/events), the same calls as the laptop pages (app/CONTRACT.md). Standalone on purpose: no
 // memory cloud, so nothing heavy loads on a phone.
-import { freshnessButton } from './freshness.js';
+import { freshnessButton, freshnessExamples } from './freshness.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -37,6 +37,10 @@ async function load() {
   const s = await api('GET', '/api/state');
   S.device = s.device;
   S.claims = new Map((s.claims || []).map(c => [c.claim_id, c]));
+  const chips = document.querySelector('.chips');
+  if (s.freshness_examples?.length && !chips.querySelector('.freshness-examples')) {
+    chips.append(freshnessExamples(api, s.freshness_examples, id => S.claims.get(id)));
+  }
   S.conflicts = new Map((s.conflicts || []).map(c => [c.conflict_id, c]));
   S.sync = s.sync;
   const [first, ...rest] = String(s.display_name || nameOf(s.device)).split(' · ');

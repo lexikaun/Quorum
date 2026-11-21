@@ -62,7 +62,7 @@ function download(data, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function route() {
-  const bench = location.hash === "#benchmark";
+  const bench = !onDevice && location.hash === "#benchmark";
   byId("verifier").hidden = bench;
   byId("benchmark").hidden = !bench;
   byId("verify-link").toggleAttribute("aria-current", !bench);
@@ -75,7 +75,8 @@ function updateMode() {
   const direct = byId("public-mode");
   const replay = document.querySelector('[name="mode"][value="replay"]');
   const publicTarget = byId("public-target");
-  publicTarget.disabled = !(liveAvailable && modelAvailable) || imported || needsNewText;
+  publicTarget.hidden = onDevice;
+  publicTarget.disabled = onDevice || !liveAvailable || imported || needsNewText;
   if (publicTarget.disabled && publicTarget.selected) byId("target").value = "Vite 7";
   const general = publicTarget.selected;
   live.disabled = !liveAvailable || imported || needsNewText;
@@ -83,12 +84,12 @@ function updateMode() {
   direct.disabled = general || imported || needsNewText;
   if (general) live.checked = true;
   else if ((live.disabled && live.checked) || (direct.disabled && direct.checked)) replay.checked = true;
-  byId("target-hint").textContent = general ? "Check public claims about other topics using search and a model."
-    : imported || needsNewText ? "Imported answers can use local Vite documentation."
-    : publicTarget.disabled ? "Public web checks require Tavily and a configured model." : "Choose Public web to check other topics.";
+  byId("target-hint").textContent = general ? "Find sources to review for a public claim. Quorum leaves the claim unverified."
+    : onDevice || imported || needsNewText ? "Choose the Vite release you want to check."
+    : publicTarget.disabled ? "Public web source search requires a Tavily key." : "Choose Public web to find sources on other topics.";
   const hint = imported ? "Imported memory uses saved excerpts on this device."
     : needsNewText ? "Enter a new public claim to enable network sources."
-    : general ? "Search the public web and evaluate the retrieved evidence with the configured model."
+    : general ? "Search and extract up to three passages per claim with Tavily."
     : live.checked ? "Search and extract official documentation with Tavily."
     : direct.checked ? "Fetch the selected version’s public sources directly."
     : !liveAvailable ? "Replay works offline. Official docs fetches live sources. Tavily requires a server-side key."
@@ -96,7 +97,7 @@ function updateMode() {
   byId("mode-hint").textContent = hint;
   const notice = byId("live-notice");
   notice.hidden = !live.checked && !direct.checked;
-  notice.textContent = general ? "Use public material only. The configured model receives your answer and source passages. Tavily receives public search queries and selected URLs."
+  notice.textContent = general ? "Use public material only. Tavily receives search queries from your text."
     : live.checked ? "Use public technical claims only. Tavily receives the public version and topic queries."
     : "Use public technical claims only. This mode requests official source pages over the network.";
 }
@@ -256,7 +257,7 @@ function traceList(trace) {
 }
 function verdictBadge(value) {
   const name = String(value || "unknown");
-  const badge = element("span", name.charAt(0).toUpperCase() + name.slice(1), "verdict");
+  const badge = element("span", name === "unknown" ? "Unverified" : name.charAt(0).toUpperCase() + name.slice(1), "verdict");
   if (["supported", "superseded", "contradicted", "passed", "failed"].includes(name)) badge.classList.add(name);
   return badge;
 }
@@ -267,17 +268,18 @@ function receipt(claim, index) {
   article.append(head);
   const conciseReason = claim.correction && claim.reason?.endsWith(claim.correction) ? claim.reason.slice(0, -claim.correction.length).trim() : claim.reason;
   if (conciseReason) article.append(element("p", conciseReason, "reason"));
+  if (claim.next_step) article.append(element("p", claim.next_step, "reason"));
   if (claim.correction) article.append(labeledLine("Correction", claim.correction, "correction"));
   const foot = element("div", null, "receipt-foot");
-  const sources = claim.evidence || [];
+  const suggestions = claim.source_suggestions || [];
+  const sources = suggestions.length ? suggestions : claim.evidence || [];
   if (sources.length) {
     const details = element("details", null, "sources");
-    if (index === 0 && sources[0].excerpt) article.append(element("blockquote", sources[0].excerpt));
-    details.append(element("summary", plural(sources.length, "source")));
+    if (!suggestions.length && index === 0 && sources[0].excerpt) article.append(element("blockquote", sources[0].excerpt));
+    details.append(element("summary", suggestions.length ? "Passages for manual review" : plural(sources.length, "source")));
     for (const source of sources) details.append(sourceCard(source));
     foot.append(details);
-  } else foot.append(element("span", "No matching source", "score"));
-  foot.append(element("span", claim.score == null ? "Support score unavailable" : "Support score " + claim.score + "/100", "score"));
+  }
   article.append(foot);
   return article;
 }
@@ -446,7 +448,10 @@ async function benchmark(event, recorded = false) {
 loadImport();
 route();
 updateMode();
-if (onDevice) byId("back-link").hidden = false;
+if (onDevice) {
+  byId("back-link").hidden = false;
+  byId("bench-link").hidden = true;
+}
 window.addEventListener("hashchange", route);
 document.querySelector(".skip").onclick = event => { event.preventDefault(); byId("main").focus(); };
 answer.oninput = () => {
@@ -491,4 +496,4 @@ api("status").then(status => {
   byId("bifrost").textContent = endpoints.length ? "Configured endpoints receive the public benchmark tasks and excerpts: " + endpoints.join(", ") + "." : "Two local agents run without credentials.";
   updateMode();
 }).catch(() => { byId("mode-hint").textContent = "Server status unavailable. Live search is disabled."; });
-if (!imported && location.hash !== "#benchmark") verify();
+if (!imported && (onDevice || location.hash !== "#benchmark")) verify();

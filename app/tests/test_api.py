@@ -413,6 +413,10 @@ def test_device_serves_freshness_lab(make_client):
     response = client.get("/lab/api/status")
     assert response.status_code == 200
     assert isinstance(response.json()["live_available"], bool)
+    assert client.get("/lab/benchmark/").status_code == 404
+    assert client.get("/lab/api/recorded-benchmark").status_code == 404
+    assert client.post("/lab/api/example", json={"condition": "normal"}).status_code == 404
+    assert client.post("/lab/api/benchmark", json={"repeats": 1}).status_code == 404
 
 def test_local_review_checks_original_claim_and_keeps_version_context(make_client):
     client, ctx = make_client()
@@ -457,3 +461,35 @@ def test_freshness_reviews_follow_the_cited_claim_revision(make_client):
     scope = {"claim_ids": [cid], "claim_versions": {cid: claim["version"]}, "target": "Vite 7"}
     for endpoint in ("/api/freshness-reviews", "/api/freshness-reviews/preview"):
         assert client.post(endpoint, json=scope).status_code == 409
+
+
+def test_freshness_needs_vite_context_and_saves_the_exact_preview(make_client, monkeypatch):
+    client, ctx = make_client()
+    ambiguous = make_claim("Internal tooling", "runtime", "18", "Node.js 18 is supported.", tier="device")
+    explicit = make_claim("Vite", "runtime", "18", "Vite 7 supports Node.js 18.", tier="device")
+    for claim in (ambiguous, explicit):
+        ctx.memory.add_claim(claim)
+    path = "/api/freshness-reviews"
+    scope = {"claim_ids": [ambiguous["claim_id"], explicit["claim_id"]], "target": "Vite 7"}
+    preview = client.post(path + "/preview", json=scope).json()
+    assert [r["claims"][0]["verdict"] for r in preview["reviews"]] == ["unknown", "contradicted"]
+
+    calls = []
+
+    def unavailable(url):
+        calls.append(url)
+        return None
+
+    monkeypatch.setattr("lab.verifier._read_upstream", unavailable)
+    online_scope = dict(scope, source_mode="public")
+    online = client.post(path + "/preview", json=online_scope).json()
+    assert calls and all("internal" not in url.lower() for url in calls)
+    assert [r["claims"][0]["verdict"] for r in online["reviews"]] == ["unknown", "unknown"]
+    assert all(r["snapshot_at"] is None for r in online["reviews"])
+    save = dict(online_scope, preview_id=online["preview_id"])
+    assert client.post(path, json=dict(save, target="Vite 6")).status_code == 409
+    before = len(calls)
+    receipts = client.post(path, json=save).json()["reviews"]
+    assert len(calls) == before
+    assert [r["checked_at"] for r in receipts] == [r["checked_at"] for r in online["reviews"]]
+    assert all(r["source_mode"] == "public" for r in receipts)

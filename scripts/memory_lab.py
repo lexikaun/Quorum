@@ -25,12 +25,24 @@ MEMORIES = (
      "Vite 7 release announcement", "https://vite.dev/blog/announcing-vite7#node-js-support",
      "Vite now requires Node.js 20.19+, 22.12+."),
 )
+EXAMPLES = (
+    {"title": "Node.js upgrade",
+     "question": "Will the team’s Node.js versions work after we move from Vite 6 to Vite 7?",
+     "claim_ids": ["vite6-node18", "vite7-node22"]},
+    {"title": "Browser build target",
+     "question": "Can we use the browser build default from our Vite 6 notes after the upgrade?",
+     "claim_ids": ["vite6-build-target"]},
+    {"title": "Before Vite 7 shipped",
+     "question": "Could the team verify Vite 7’s Node.js requirements on 1 June 2025?",
+     "claim_ids": ["vite7-node22"], "as_of": "2025-06-01"},
+)
 
 
 def create_device(data_dir, port):
     cfg = Config(device="research", display_name="Research · Vite memory", data_dir=data_dir,
                  port=port, today=date.today(), hub_collection="quorum_research_demo")
     app = create_app(cfg)
+    app.state.freshness_examples = EXAMPLES
     ctx = app.state.ctx
     ctx.sync.set_online(False)
     # Stable IDs let a restart fill a partially seeded shard and preserve user edits.
@@ -58,7 +70,8 @@ def main():
         listener.listen()
         app = create_device(DATA_DIR, PORT)
         print(f"Open http://127.0.0.1:{PORT}/ and ask: What do we know about Vite?", flush=True)
-        uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=PORT)).run(sockets=[listener])
+        config = uvicorn.Config(app, host="127.0.0.1", port=PORT, timeout_graceful_shutdown=2)
+        uvicorn.Server(config).run(sockets=[listener])
 
 
 if __name__ == "__main__":

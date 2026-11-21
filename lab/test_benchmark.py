@@ -34,7 +34,9 @@ def local_endpoint(respond):
 
 class BenchmarkTests(unittest.TestCase):
     def setUp(self):
-        env = patch.dict(os.environ, {}, clear=True)
+        # On Windows urllib initializes the OS certificate store even for loopback HTTP.
+        system = {key: os.environ[key] for key in ("SYSTEMROOT",) if key in os.environ}
+        env = patch.dict(os.environ, system, clear=True)
         env.start()
         self.addCleanup(env.stop)
 

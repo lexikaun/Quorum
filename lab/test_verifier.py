@@ -30,7 +30,9 @@ class VerificationTests(unittest.TestCase):
 
     def test_patch_levels_negations_and_compound_claims(self):
         cases = {
-            "Vite 7 supports Node.js 22.11.9.": "superseded",
+            "Vite 7 supports Node.js 22.11.9.": "contradicted",
+            "Vite 7.0.0 supports Node.js 18.": "contradicted",
+            "Vite 7.1 supports Node.js 22.12.": "unknown",
             "Vite 7 supports Node.js 20.19.0.": "supported",
             "Vite 7 does not support Node.js 18.": "supported",
             "Vite 7 supports Node.js 21.": "contradicted",
@@ -41,12 +43,12 @@ class VerificationTests(unittest.TestCase):
             "Does Vite 7 support Node.js 18?": "unknown",
             "Vite 7 does not run on Node 18.": "supported",
             "Node.js 18 is not supported by Vite 7.": "supported",
-            "You can run Vite 7 on Node.js 18.": "superseded",
-            "Node.js 18 still works with Vite 7.": "superseded",
+            "You can run Vite 7 on Node.js 18.": "contradicted",
+            "Node.js 18 still works with Vite 7.": "contradicted",
             "The minimum Node.js version for Vite 7 is 20.19.0.": "supported",
             "Vite 7 dropped support for Node.js 18.": "supported",
-            "Vite 7 requires at least Node.js 18.": "superseded",
-            "Vite 7 requires at least Node.js 20.19.0.": "supported",
+            "Vite 7 requires at least Node.js 18.": "unknown",
+            "Vite 7 requires at least Node.js 20.19.0.": "unknown",
             "Vite 7 needs Node.js 22.12.0 exclusively.": "unknown",
             "Node.js 18 is supported if a custom patch is installed.": "unknown",
             "Node.js 18.0.0-beta.1 is supported.": "unknown",
@@ -63,8 +65,10 @@ class VerificationTests(unittest.TestCase):
 
     def test_compound_sentences_preserve_individual_claims_and_source_context(self):
         examples = [
-            ("Vite 7 supports Node 18 and Node 22.12.", ["superseded", "supported"]),
-            ("Vite 7 supports Node 18 and deploys to the moon.", ["superseded", "unknown"]),
+            ("Vite 7 supports Node 18 and Node 22.12.", ["contradicted", "supported"]),
+            ("Vite 7 supports Node 18 and deploys to the moon.", ["unknown"]),
+            ("Vite 7 supports Node 22.12\n only with a custom patch.", ["unknown"]),
+            ("Node 22.12 works and Node 18 works only on Windows.", ["unknown"]),
             ("Node 18 is unsupported, but Node 22.12 is supported.", ["supported", "supported"]),
             ("Vite 6 supports Node 18 and Node 22.12.", ["unknown", "unknown"]),
             ("If Vite supports Node 18 and Node 22.12, use it.", ["unknown"]),
@@ -82,8 +86,9 @@ class VerificationTests(unittest.TestCase):
                 self.assertEqual(result["as_of"], day)
         claim = verify("The default build.target is 'modules'.", "Vite 6", as_of="2025-01-01")["claims"][0]
         self.assertEqual(claim["verdict"], "unknown")
-        with self.assertRaises(ValueError):
-            verify("Node 18 works.", "Vite 7", as_of="2025-02-30")
+        for cutoff in ["2025-02-30", "9999-01-01"]:
+            with self.assertRaises(ValueError):
+                verify("Node 18 works.", "Vite 7", as_of=cutoff)
 
     def test_live_reads_both_versioned_excerpts_and_keeps_pasted_text_local(self):
         calls = []
@@ -177,7 +182,7 @@ class VerificationTests(unittest.TestCase):
         self.assertTrue(any(e["status"] == "unavailable" for e in result["trace"]))
 
     def test_replay_cannot_consult_withheld_sources(self):
-        task = "Vite 7 supports Node 18."
+        task = "Node 18 is supported."
         old_url = "https://vite.dev/blog/announcing-vite6#node-js-support"
         new_url = "https://vite.dev/blog/announcing-vite7#node-js-support"
         for allowed, expected in [([], "unknown"), ([old_url], "unknown"),

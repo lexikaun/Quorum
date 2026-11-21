@@ -1,4 +1,4 @@
-"""Loopback demo server. The device app mounts the same WSGI application."""
+"""Loopback lab server with a verifier-only mount for the device app."""
 import argparse
 import json
 import logging
@@ -35,7 +35,7 @@ def status():
             "external_agent_available": bool(os.getenv("LAB_AGENT_URL"))}
 
 
-def dispatch(path, data):
+def dispatch(path, data, *, public_web_enabled=True):
     if not isinstance(data, dict):
         raise ValueError("Send a JSON object.")
     if path == "/api/verify":
@@ -47,8 +47,10 @@ def dispatch(path, data):
             raise ValueError("Choose a listed target and evidence mode.")
         if mode == "live" and not status()["live_available"]:
             raise ValueError("Live search requires TAVILY_API_KEY on the server.")
-        if target == "Public web" and (mode != "live" or not status()["bifrost_available"]):
-            raise ValueError("Public web requires Tavily live mode and a configured Bifrost model.")
+        if target == "Public web" and not public_web_enabled:
+            raise ValueError("Public web source search is only available in the standalone lab.")
+        if target == "Public web" and mode != "live":
+            raise ValueError("Public web source search requires Tavily live mode.")
         from .verifier import verify
         as_of = data.get("as_of")
         if as_of is not None and (not isinstance(as_of, str) or len(as_of) != 10):
@@ -64,7 +66,7 @@ def dispatch(path, data):
     return run_benchmark(repeats=repeats)
 
 
-def application(env, start_response):
+def application(env, start_response, *, benchmark_enabled=True, public_web_enabled=True):
     def respond(status_line, payload, content_type="application/json"):
         raw = payload if isinstance(payload, bytes) else json.dumps(payload, allow_nan=False).encode()
         start_response(status_line, [("Content-Type", content_type + "; charset=utf-8"),
@@ -72,6 +74,10 @@ def application(env, start_response):
                                      ("X-Content-Type-Options", "nosniff")])
         return [raw]
     path, method = env.get("PATH_INFO", "/"), env.get("REQUEST_METHOD", "GET")
+    if not benchmark_enabled and (
+        path.startswith("/benchmark/") or path in ("/api/benchmark", "/api/example", "/api/recorded-benchmark")
+    ):
+        return respond("404 Not Found", {"error":"Page not found."})
     if method == "GET":
         if path == "/api/status":
             return respond("200 OK", status())
@@ -95,7 +101,7 @@ def application(env, start_response):
         if not 0 < size <= MAX_BYTES:
             raise ValueError("Request size outside the supported range.")
         data = json.loads(env["wsgi.input"].read(size))
-        return respond("200 OK", dispatch(path, data))
+        return respond("200 OK", dispatch(path, data, public_web_enabled=public_web_enabled))
     except (ValueError, UnicodeError) as exc:
         return respond("400 Bad Request", {"error":str(exc)})
     except Exception:

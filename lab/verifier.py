@@ -12,7 +12,9 @@ from urllib.parse import urlsplit
 
 SNAPSHOT = json.loads((Path(__file__).parent / "fixtures" / "vite_evidence.json").read_text("utf-8"))
 TARGETS = ("Vite 6", "Vite 7")
-VITE = r"vite(?:\s+v?\d+)?"
+VITE_RELEASE_NUMBER = r"\d+(?:\.\d+){0,2}"
+VITE = rf"vite(?:\s+v?{VITE_RELEASE_NUMBER})?"
+VITE_RELEASE = re.compile(rf"\bvite\s+v?({VITE_RELEASE_NUMBER})\b", re.I)
 NODE = r"node(?:\.js|js)?(?:\s+version)?\s+v?"
 VERSION = r"(?P<version>\d{1,3}(?:\.\d{1,5}){0,2})"
 RUNTIME_CLAIMS = (
@@ -29,18 +31,21 @@ DEFAULT_CLAIM = (
 
 
 def _statements(text):
-    text = re.sub(r"(?m)^\s*(?:[-*•]|\d+[.)])\s+", "", text)
-    return [part.strip() for part in re.split(r"(?<=[.!?])\s+|\n+|;\s*", text) if part.strip()]
+    # A wrapped line can contain a qualification to the previous line.
+    text = re.sub(r"(?m)^[ \t]*(?:[-*•]|\d+[.)])[ \t]+", "\n\n", text)
+    return [part.strip() for part in re.split(r"(?<=[.!?])\s+|\n[ \t]*\n", text) if part.strip()]
 
 
-def _parse(statement, target):
+def _parse(statement, target, vite_context):
     """Use full statements so an incidental version inside unrelated prose cannot pass."""
     clean = " ".join(statement.strip(".! ").lower().replace(chr(96), "").replace("’", "'").split())
-    versions = re.findall(r"\bvite\s+v?(\d+)\b", clean)
-    if any(v != target[-1] for v in versions):
-        return None, "The claim names a different Vite release. Select that release to check it."
-    floor = (re.fullmatch(rf"(?:{VITE}\s+)?(?:requires?|needs?) (?:at least )?{NODE}{VERSION}", clean)
-             or re.fullmatch(rf"(?:the )?minimum node(?:\.js)? version(?: for {VITE})? is {VERSION}", clean))
+    if not vite_context and not re.search(r"\bvite\b", clean):
+        return None, "This saved claim does not identify Vite. Quorum cannot apply Vite documentation to it."
+    versions = VITE_RELEASE.findall(clean)
+    major = target.rsplit(" ", 1)[-1]
+    if any(v not in (major, major + ".0", major + ".0.0") for v in versions):
+        return None, "The claim names a different Vite release. Quorum covers Vite 6.0 and 7.0."
+    floor = re.fullmatch(rf"(?:the )?minimum node(?:\.js)? version(?: for {VITE})? is {VERSION}", clean)
     if floor:
         return ("node", "minimum", floor["version"], False), ""
     dropped = re.fullmatch(rf"(?:{VITE}\s+)?(?:dropped support for|no longer supports) {NODE}{VERSION}", clean)
@@ -55,21 +60,21 @@ def _parse(statement, target):
     default = re.fullmatch(DEFAULT_CLAIM, clean)
     if default:
         return ("build", "default", default[1], False), ""
-    return None, "This verifier has no matching check for this statement in its versioned evidence."
+    return None, "Quorum checks explicit Node.js compatibility and default build targets for Vite. It could not match this statement."
 
 
-def _split_claims(statement, target):
-    """Split affirmative conjunctions with an identifiable first assertion; keep disjunctions intact."""
+def _split_claims(statement, target, vite_context):
+    """Split only conjunctions whose clauses can all be interpreted in context."""
     parts = re.split(r",?\s+(?:and|but)\s+", statement, flags=re.I)
     if len(parts) == 1:
-        return [(statement, *_parse(statement, target))]
-    subject = re.match(r"(vite(?:\s+v?\d+)?)\s+", parts[0], re.I)
-    named = re.match(r"vite\s+v?([67])\b", parts[0], re.I)
-    scoped_target = "Vite " + named[1] if named else target
-    first, _ = _parse(parts[0], scoped_target)
+        return [(statement, *_parse(statement, target, vite_context), bool(VITE_RELEASE.search(statement)))]
+    subject = re.match(rf"({VITE})\s+", parts[0], re.I)
+    named = VITE_RELEASE.search(parts[0])
+    scoped_target = "Vite " + named[1].split(".")[0] if named else target
+    first, reason = _parse(parts[0], scoped_target, vite_context)
     if not first:
-        return [(statement, *_parse(statement, target))]
-    claims = [(parts[0], *_parse(parts[0], target))]
+        return [(statement, None, reason, bool(named))]
+    clauses = [(parts[0], parts[0])]
     # A repeated object ("supports Node 18 and Node 22") inherits the full verb.
     runtime_prefix = re.fullmatch(rf"(.*?){NODE}{VERSION}[.!]?", parts[0], re.I)
     for original in parts[1:]:
@@ -79,11 +84,15 @@ def _split_claims(statement, target):
                 expanded = runtime_prefix[1] + original
             elif subject and re.match(r"(?:supports?|runs?|works?|does not|requires?|needs?)\b", original, re.I):
                 expanded = subject[1] + " " + original
-            if scoped_target != target:
-                claims.append((original, None, "This clause refers to a different Vite release."))
-                continue
-        claims.append((original, *_parse(expanded, target)))
-    return claims
+            elif named:
+                return [(statement, None, "Write each claim as a standalone sentence with its Vite release.", True)]
+        clause_release = VITE_RELEASE.search(expanded)
+        clause_target = "Vite " + clause_release[1].split(".")[0] if clause_release else target
+        if not _parse(expanded, clause_target, vite_context)[0]:
+            return [(statement, None, "Quorum cannot check this compound statement as written. Write each claim as a standalone sentence.", bool(named))]
+        clauses.append((original, expanded))
+    return [(original, *_parse(expanded, target, vite_context), bool(VITE_RELEASE.search(expanded)))
+            for original, expanded in clauses]
 
 
 def _tuple(version):
@@ -235,9 +244,10 @@ def _tavily_extracts(candidates, trace):
     return found, extracts
 
 
-def _sources(topics, target, mode, timestamp, trace, as_of, replay_sources):
+def _sources(topics, target, mode, timestamp, trace, as_of, replay_sources, upstream_reader):
     candidates = [s for s in SNAPSHOT["sources"] if s["topic"] in topics and s["target"] <= target
-                  and (as_of is None or (s["published_at"] or SNAPSHOT["retrieved_at"][:10]) <= as_of)]
+                  and (as_of is None or (s["published_at"] or (
+                      SNAPSHOT["retrieved_at"][:10] if mode == "replay" else "9999-12-31")) <= as_of)]
     if mode == "replay":
         if replay_sources is not None:
             allowed = set(replay_sources)
@@ -249,7 +259,7 @@ def _sources(topics, target, mode, timestamp, trace, as_of, replay_sources):
         urls = _source_urls(found)
         extracts = {}
         with ThreadPoolExecutor(max_workers=4) as pool:
-            for url, content in zip(urls, pool.map(_read_upstream, urls)):
+            for url, content in zip(urls, pool.map(upstream_reader, urls)):
                 trace.append({"operation": "upstream.get", "url": url, "status": "ok" if content else "unavailable"})
                 if content:
                     extracts[url] = content
@@ -275,15 +285,17 @@ def _evidence(source):
     return evidence
 
 
-def _receipt(statement, parsed, reason, target, sources, as_of):
+def _receipt(statement, parsed, reason, target, sources, as_of, explicit_release):
     receipt = {"text": statement, "verdict": "unknown", "score": None, "reason": reason,
                "correction": "", "evidence": []}
     if not parsed:
         return receipt
     source = sources.get((target, parsed[0]))
     if source is None:
-        receipt["reason"] = ("No eligible source establishes this claim by " + as_of + "." if as_of else
-                             "The expected passage was unavailable in the retrieved official documentation.")
+        receipt["reason"] = ("Quorum could not verify the required documentation by " + as_of + "." if as_of else
+                             "Quorum could not confirm the required passage in the selected documentation.")
+        receipt["next_step"] = ("Try a later cutoff or check without a date." if as_of else
+                                "Try again or open the official release notes for the selected version.")
         return receipt
     receipt["evidence"] = [_evidence(source)]
     previous = sources.get(("Vite 6", parsed[0])) if target == "Vite 7" else None
@@ -298,20 +310,21 @@ def _receipt(statement, parsed, reason, target, sources, as_of):
                        reason=previous["rule"] + " " + source["rule"], correction="" if dropped else source["rule"])
         return receipt
     if result is None:
-        receipt["reason"] = "The named major spans both supported and unsupported versions. " + source["rule"]
-        receipt["correction"] = "Specify the Node.js minor or patch version."
+        receipt["reason"] = "The stated Node.js version includes both supported and unsupported releases. " + source["rule"]
+        receipt["next_step"] = "Specify the full Node.js version, including the patch number."
     elif result:
         receipt.update(verdict="supported", score=100, reason=source["rule"])
     else:
         receipt.update(verdict="contradicted", score=0, reason=source["rule"], correction=source["rule"])
-        if previous and _assess(parsed, previous) is True:
+        if previous and not explicit_release and _assess(parsed, previous) is True:
             receipt["verdict"] = "superseded"
             receipt["reason"] = "This guidance matches Vite 6. " + source["rule"]
             receipt["evidence"].append(_evidence(previous))
     return receipt
 
 
-def verify(text, target="Vite 7", mode="replay", as_of=None, *, replay_sources=None):
+def verify(text, target="Vite 7", mode="replay", as_of=None, *, replay_sources=None,
+           vite_context=True, upstream_reader=None):
     """Return evidence receipts. Score measures target support, and unknown has no score."""
     if target == "Public web" and mode != "live":
         raise ValueError("Public web requires live mode.")
@@ -324,22 +337,25 @@ def verify(text, target="Vite 7", mode="replay", as_of=None, *, replay_sources=N
     if as_of is not None:
         if not isinstance(as_of, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", as_of):
             raise ValueError("as_of must be a UTC date in YYYY-MM-DD format.")
-        date.fromisoformat(as_of)
+        if date.fromisoformat(as_of) > datetime.now(timezone.utc).date():
+            raise ValueError("Choose today or an earlier date. Quorum cannot check future evidence.")
     timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     if target == "Public web":
         from .public_web import verify_public
         return verify_public(text, as_of, timestamp, _tavily)
-    statements = [claim for sentence in _statements(text) for claim in _split_claims(sentence, target)]
+    statements = [claim for sentence in _statements(text) for claim in _split_claims(sentence, target, vite_context)]
     if not statements:
         raise ValueError("Paste at least one statement to verify.")
     trace = []
-    topics = {parsed[0] for _, parsed, _ in statements if parsed}
-    sources = _sources(topics, target, mode, timestamp, trace, as_of, replay_sources)
-    claims = [_receipt(s, parsed, reason, target, sources, as_of) for s, parsed, reason in statements]
+    topics = {parsed[0] for _, parsed, _, _ in statements if parsed}
+    sources = _sources(topics, target, mode, timestamp, trace, as_of, replay_sources, upstream_reader or _read_upstream)
+    claims = [_receipt(s, parsed, reason, target, sources, as_of, explicit)
+              for s, parsed, reason, explicit in statements]
     privacy = {
         "replay": "Replay reads bundled public excerpts locally. No external requests.",
         "public": "The server fetches fixed official Vite pages and manifests. Pasted text stays local.",
         "live": "Only public Vite release and topic queries go to Tavily. Pasted text stays local.",
     }[mode]
     return {"target": target, "mode": mode, "as_of": as_of, "timestamp": timestamp, "privacy": privacy,
+            "snapshot_at": SNAPSHOT["retrieved_at"] if mode == "replay" else None,
             "trace": trace, "claims": claims}

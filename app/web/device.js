@@ -5,7 +5,7 @@
 // conflict / sync / activity) are applied by id. Listeners (ui.on) see every event, so the stage
 // can caption what happened without opening a second stream.
 import { MemoryCloud, COLORS, LOOK, claimState } from './cloud.js';
-import { freshnessButton } from './freshness.js';
+import { freshnessButton, freshnessExamples } from './freshness.js';
 
 const RESOLVED_CARD_MS = 15000;
 
@@ -237,6 +237,9 @@ export function createDeviceUI(root, opts = {}) {
   function hydrate(s) {
     state.device = s.device; state.displayName = s.display_name || nameOf(s.device); state.today = s.today;
     state.claims = new Map((s.claims || []).map(c => [c.claim_id, c]));
+    if (!stage && !opts.transport && s.freshness_examples?.length && !el('suggestions').querySelector('.freshness-examples')) {
+      el('suggestions').append(freshnessExamples(api, s.freshness_examples, id => state.claims.get(id)));
+    }
     state.conflicts = new Map((s.conflicts || []).map(c => [c.conflict_id, c]));
     state.activity = sortActivity(dedupeActivity(s.activity || []));
     cloud.setClaims([...state.claims.values()]);

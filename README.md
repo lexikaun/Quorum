@@ -108,9 +108,9 @@ Launch from the repository root with Python 3.10+.
 python -m lab.server
 ```
 
-Open [the lab](http://127.0.0.1:8765/) for the Tavily freshness verifier and Bifrost agent benchmark. Local replay and the recorded Bifrost run require no provider credentials. The [demo guide](DEMO_GUIDE.md) covers both flows and optional live provider setup.
+Open [the standalone benchmark](http://127.0.0.1:8765/#benchmark) for the Bifrost agent benchmark. The recorded run requires no provider credentials. The [demo guide](DEMO_GUIDE.md) covers the separate benchmark and Quorum’s freshness verifier, including optional live provider setup.
 
-To run the lab inside the existing device app on Windows, create the environment with Python 3.12 and install device dependencies.
+To run the freshness verifier inside the Quorum device app on Windows, create the environment with Python 3.12 and install device dependencies.
 
 ```powershell
 py -3.12 -m venv app/.venv
@@ -119,7 +119,7 @@ app/.venv/Scripts/python.exe -m pip install -r app/requirements.txt
 app/.venv/Scripts/python.exe scripts/memory_lab.py
 ```
 
-Open [the demo device](http://127.0.0.1:8766/). The first start may download the embedding model. The demo launcher uses a separate persistent device directory with three cited examples.
+After setup, double-click `start-quorum.bat` in the repository root to start the app on Windows. Keep its window open and visit [Quorum](http://127.0.0.1:8766/). Press Ctrl+C in the launcher window to stop the server. The first start may download the embedding model. The demo launcher uses a separate persistent device directory with three cited examples.
 
 ```powershell
 python -m unittest discover -s lab -q

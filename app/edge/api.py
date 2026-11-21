@@ -4,9 +4,12 @@ import re
 import threading
 import time
 import urllib.parse
+from collections import OrderedDict
 from contextlib import asynccontextmanager
+from functools import lru_cache, partial
 from types import SimpleNamespace
 from typing import Literal
+from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -61,6 +64,8 @@ class ReviewBody(BaseModel):
     claim_versions: dict[str, int] = Field(default_factory=dict, max_length=32)
     target: Literal["Vite 6", "Vite 7"]
     as_of: str | None = None
+    source_mode: Literal["replay", "public"] = "replay"
+    preview_id: str | None = Field(default=None, max_length=32)
 
 
 def build_ctx(cfg, *, embedder=None, store=None, sync=None) -> SimpleNamespace:
@@ -105,6 +110,7 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
             "conflicts": ctx.store.list_conflicts(),
             "activity": ctx.store.recent_activity(ACTIVITY_LIMIT),
             "peers": PEERS,
+            "freshness_examples": getattr(app.state, "freshness_examples", []),
         }
 
     @app.get("/api/events")
@@ -144,6 +150,7 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
         }
 
     review_lock = threading.Lock()
+    previews = OrderedDict()
 
     @app.get("/api/freshness-reviews/{claim_id}")
     def reviews(claim_id: str):
@@ -152,44 +159,74 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
             raise HTTPException(404, "Unknown local claim.")
         return {"current_version": claim["version"], "reviews": ctx.store.kv_get("reviews:" + claim_id, [])}
 
-    def check_reviews(body: ReviewBody):
-        from lab.verifier import verify
-        receipts = []
+    def cited_claims(body: ReviewBody):
         for cid in dict.fromkeys(body.claim_ids):
             claim = ctx.memory.get(cid)
             if claim is None:
                 raise HTTPException(404, "Unknown local claim.")
             if body.claim_versions.get(cid, claim["version"]) != claim["version"]:
-                raise HTTPException(409, "A cited claim changed. Ask Quorum again before saving.")
+                raise HTTPException(409, "A cited claim changed. Ask Quorum again or reload to check the latest revision.")
+            yield claim
+
+    def check_reviews(body: ReviewBody):
+        from lab.verifier import _read_upstream, verify
+
+        upstream_reader = lru_cache(maxsize=8)(_read_upstream)
+        receipts = []
+        for claim in cited_claims(body):
             try:
-                check = verify(claim["text"], body.target, "replay", as_of=body.as_of)
+                check = verify(claim["text"], body.target, body.source_mode, as_of=body.as_of,
+                               vite_context=claim["entity"].strip().casefold() == "vite",
+                               upstream_reader=upstream_reader)
             except ValueError as exc:
                 raise HTTPException(400, str(exc)) from exc
-            receipts.append({"claim_id": cid, "version": claim["version"], "target": body.target,
-                             "as_of": body.as_of, "checked_at": check["timestamp"], "claims": check["claims"]})
+            receipts.append({"claim_id": claim["claim_id"], "version": claim["version"], "target": body.target,
+                             "as_of": body.as_of, "source_mode": body.source_mode,
+                             "snapshot_at": check["snapshot_at"], "checked_at": check["timestamp"],
+                             "claims": check["claims"], "source": claim.get("source")})
         return receipts
 
-    review_scope = ("version", "target", "as_of")
+    def review_key(receipt):
+        return (receipt["version"], receipt["target"], receipt["as_of"], receipt.get("source_mode", "replay"))
 
     @app.post("/api/freshness-reviews/preview")
     def preview_reviews(body: ReviewBody):
         receipts = check_reviews(body)
         for receipt in receipts:
             saved = ctx.store.kv_get("reviews:" + receipt["claim_id"], [])
-            match = next((r for r in saved if all(r[field] == receipt[field] for field in review_scope)), None)
-            if match is not None and match["claims"] == receipt["claims"]:
+            match = next((r for r in saved if review_key(r) == review_key(receipt)), None)
+            if body.source_mode == "replay" and match is not None and match["claims"] == receipt["claims"]:
                 receipt["saved_at"] = match["checked_at"]
-        return {"reviews": receipts}
+        preview_id = uuid4().hex
+        with review_lock:
+            previews[preview_id] = (time.monotonic(), body.model_dump(exclude={"preview_id"}), receipts)
+            if len(previews) > 24:
+                previews.popitem(last=False)
+        return {"reviews": receipts, "preview_id": preview_id}
 
     @app.post("/api/freshness-reviews")
     def save_reviews(body: ReviewBody):
-        receipts = check_reviews(body)
+        if body.preview_id:
+            with review_lock:
+                preview = previews.get(body.preview_id)
+            if (not preview or time.monotonic() - preview[0] > 1800
+                    or preview[1] != body.model_dump(exclude={"preview_id"})):
+                raise HTTPException(409, "This check expired or its settings changed. Check claims again before saving.")
+            versions = {claim["claim_id"]: claim["version"] for claim in cited_claims(body)}
+            if any(versions[r["claim_id"]] != r["version"] for r in preview[2]):
+                raise HTTPException(409, "A cited claim changed. Ask Quorum again or reload to check the latest revision.")
+            receipts = preview[2]
+        elif body.source_mode == "replay":
+            # Older clients saved a replay directly.
+            receipts = check_reviews(body)
+        else:
+            raise HTTPException(400, "Check claims before saving online results.")
+        receipts = [{k: v for k, v in r.items() if k not in ("source", "saved_at")} for r in receipts]
         # Per-device SQLite only. Keep up to 12 distinct release/date/version checks per claim.
         with review_lock:
             for receipt in receipts:
                 key = "reviews:" + receipt["claim_id"]
-                saved = [r for r in ctx.store.kv_get(key, []) if any(
-                    r[field] != receipt[field] for field in review_scope)]
+                saved = [r for r in ctx.store.kv_get(key, []) if review_key(r) != review_key(receipt)]
                 ctx.store.kv_set(key, [receipt, *saved[:11]])
         return {"reviews": receipts}
 
@@ -274,7 +311,8 @@ def create_app(cfg, *, embedder=None, store=None, sync=None) -> FastAPI:
 
     # Mounted last so /api/* wins. index.html uses relative asset paths, so the UI must resolve at
     # the root ("/" -> index.html, "/app.js") as well as under /web.
-    app.mount("/lab", WSGIMiddleware(lab_application), name="research-lab")
+    app.mount("/lab", WSGIMiddleware(partial(lab_application, benchmark_enabled=False, public_web_enabled=False)),
+              name="research-lab")
     app.mount("/web", StaticFiles(directory=WEB_DIR, html=True, check_dir=False), name="web")
     app.mount("/", StaticFiles(directory=WEB_DIR, html=True, check_dir=False), name="root")
     return app
